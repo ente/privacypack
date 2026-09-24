@@ -479,6 +479,7 @@
             ],
             "private_alternatives": [
                 { "id": "arch_linux", "name": "Arch Linux" },
+                { "id": "omarchy", "name": "Omarchy" },
                 { "id": "macos", "name": "macOS" },
                 { "id": "linux_mint", "name": "Linux Mint" },
                 { "id": "qubes_os", "name": "Qubes OS" },

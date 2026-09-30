@@ -61,7 +61,8 @@
                 { "id": "searxng", "name": "SearXNG" },
                 { "id": "mojeek", "name": "Mojeek" },
                 { "id": "qwant", "name": "Qwant" },
-                { "id": "murena_find", "name": "Murena Find" }
+                { "id": "murena_find", "name": "Murena Find" },
+                {"id": "ecosia", "name": "Ecosia" }
             ]
         },
         {
@@ -71,7 +72,7 @@
                 { "id": "chrome", "name": "Chrome" },
                 { "id": "safari", "name": "Safari" },
                 { "id": "edge", "name": "Edge" },
-                { "id": "opera", "name": "Opera" }
+                { "id": "opera", "name": "Opera"}
             ],
             "private_alternatives": [
                 { "id": "zen_browser", "name": "Zen Browser" },
@@ -127,6 +128,7 @@
                 { "id": "notion", "name": "Notion" }
             ],
             "private_alternatives": [
+                {"id": "trudido", "name": "Trudido" },
                 { "id": "standard_notes", "name": "Standard Notes" },
                 { "id": "memos", "name": "Memos" },
                 { "id": "notesnook", "name": "Notesnook" },

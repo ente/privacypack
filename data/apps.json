@@ -71,7 +71,8 @@
                 { "id": "chrome", "name": "Chrome" },
                 { "id": "safari", "name": "Safari" },
                 { "id": "edge", "name": "Edge" },
-                { "id": "opera", "name": "Opera" }
+                { "id": "opera", "name": "Opera" },
+                { "id": "samsung_browser", "name": "Samsung Browser"}
             ],
             "private_alternatives": [
                 { "id": "zen_browser", "name": "Zen Browser" },

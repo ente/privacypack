@@ -354,7 +354,8 @@
             "mainstream_apps": [
                 { "id": "google_translate", "name": "Google Translate" },
                 { "id": "apple_translate", "name": "Apple Translate" },
-                { "id": "deepl", "name": "DeepL" }
+                { "id": "deepl", "name": "DeepL" },
+                { "id": "microsoft_translator", "name": "Microsoft Translator"}
             ],
             "private_alternatives": [
                 { "id": "libretranslate", "name": "LibreTranslate" },

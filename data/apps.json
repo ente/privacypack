@@ -141,7 +141,7 @@
                 { "id": "fossify_notes", "name": "Fossify Notes" },
                 { "id": "murena_workspace", "name": "Murena Notes" },
                 { "id": "jtx_board", "name": "jtx Board" },
-                { "id": "calino", "name": "Calino" }
+                { "id": "calino", "name": "CalDAV/Calino" }
             ]
         },
         {
@@ -234,7 +234,7 @@
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
                 { "id": "murena_workspace", "name": "Murena Calendar" },
-                { "id": "calino", "name": "Calino" }
+                { "id": "calino", "name": "CalDAV/Calino" }
             ]
         },
         {
@@ -247,7 +247,7 @@
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
                 { "id": "proton_mail", "name": "Proton Contacts" },
                 { "id": "tuta_mail", "name": "Tuta Contacts" },
-                { "id": "calino", "name": "Calino" }
+                { "id": "calino", "name": "CalDAV/Calino" }
             ]
         },
         {

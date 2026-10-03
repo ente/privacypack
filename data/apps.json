@@ -139,7 +139,9 @@
                 { "id": "fileverse", "name": "DDocs.new" },
                 { "id": "joplin", "name": "Joplin" },
                 { "id": "fossify_notes", "name": "Fossify Notes" },
-                { "id": "murena_workspace", "name": "Murena Notes" }
+                { "id": "murena_workspace", "name": "Murena Notes" },
+                { "id": "jtx_board", "name": "jtx Board" },
+                { "id": "calino", "name": "Calino" }
             ]
         },
         {
@@ -231,7 +233,8 @@
                 { "id": "nextcloud_calendar", "name": "Nextcloud Calendar" },
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
-                { "id": "murena_workspace", "name": "Murena Calendar" }
+                { "id": "murena_workspace", "name": "Murena Calendar" },
+                { "id": "calino", "name": "Calino" }
             ]
         },
         {
@@ -243,7 +246,8 @@
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
                 { "id": "proton_mail", "name": "Proton Contacts" },
-                { "id": "tuta_mail", "name": "Tuta Contacts" }
+                { "id": "tuta_mail", "name": "Tuta Contacts" },
+                { "id": "calino", "name": "Calino" }
             ]
         },
         {

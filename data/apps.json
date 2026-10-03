@@ -174,16 +174,16 @@
             "order": 8,
             "mainstream_apps": [
                 { "id": "google_passwords", "name": "Google Passwords" },
-                { "id": "samsung_pass", "name": "Samsung Pass" },
-                { "id": "lastpass", "name": "LastPass" },
-                { "id": "apple_passwords", "name": "Apple Passwords" },
-                { "id": "nordpass", "name": "NordPass" },
-                { "id": "dashlane", "name": "Dashlane" }
+                { "id": "lastpass", "name": "LastPass" }
             ],
             "private_alternatives": [
                 { "id": "bitwarden", "name": "Bitwarden" },
+                { "id": "apple_passwords", "name": "Apple Passwords" },
+                { "id": "samsung_pass", "name": "Samsung Pass" },
                 { "id": "1password", "name": "1Password" },
                 { "id": "proton_pass", "name": "Proton Pass" },
+                { "id": "dashlane", "name": "Dashlane" },
+                { "id": "nordpass", "name": "NordPass" },
                 { "id": "keepass", "name": "KeePass" },
                 { "id": "keepassxc", "name": "KeePassXC" },
                 { "id": "keevault", "name": "Kee Vault" },

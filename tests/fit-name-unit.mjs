@@ -15,8 +15,12 @@ const { ZERO_WIDTH_SPACE, fitName } = await loadTsModule(
 const catalog = JSON.parse(
     await fs.readFile(path.join(repoRoot, "data", "apps.json"), "utf8"),
 );
-// Matches lib/fit-name.ts, which leaves room for system monospace fonts.
+// Matches lib/fit-name.ts, which leaves room for system monospace fonts and
+// for Chrome on Linux rounding each glyph to a whole pixel.
 const GLYPH_ADVANCE_EM = 0.605;
+const GLYPH_ROUNDING_PX = 0.5;
+const glyphWidth = (fontSize) =>
+    GLYPH_ADVANCE_EM * fontSize + GLYPH_ROUNDING_PX;
 
 test("names whose words fit are left alone", () => {
     assert.deepEqual(fitName("Proton Mail", 140, 18), {
@@ -46,10 +50,8 @@ test("a word with no break opportunity is set small enough to fit", () => {
 
     assert.equal(text, "Yubico Authenticator");
     assert.ok(fontSize < 18);
-    assert.ok("Authenticator".length * GLYPH_ADVANCE_EM * fontSize <= 140);
-    assert.ok(
-        "Authenticator".length * GLYPH_ADVANCE_EM * (fontSize + 0.1) > 140,
-    );
+    assert.ok("Authenticator".length * glyphWidth(fontSize) <= 140);
+    assert.ok("Authenticator".length * glyphWidth(fontSize + 0.1) > 140);
 });
 
 test("every catalog name fits every export column without a mid-word cut", () => {
@@ -77,7 +79,7 @@ test("every catalog name fits every export column without a mid-word cut", () =>
             assert.equal(fitted.text.replaceAll(ZERO_WIDTH_SPACE, ""), name);
             for (const part of fitted.text.split(/[ ​]/)) {
                 assert.ok(
-                    part.length * GLYPH_ADVANCE_EM * fitted.fontSize <= width,
+                    part.length * glyphWidth(fitted.fontSize) <= width,
                     `${name} at ${width}px`,
                 );
             }

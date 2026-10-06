@@ -5,6 +5,17 @@ import "./globals.css";
 
 const jetBrainsMono = localFont({
     src: "./JetBrainsMono.ttf",
+    // If the font is blocked and there is no Arial for next/font's fallback
+    // (Linux), keep the page monospace rather than the browser default.
+    // The same list as SYSTEM_MONO_FAMILY in lib/export-image.ts.
+    fallback: [
+        "Menlo",
+        "Consolas",
+        "DejaVu Sans Mono",
+        "Liberation Mono",
+        "Noto Sans Mono",
+        "monospace",
+    ],
 });
 
 export const metadata: Metadata = {

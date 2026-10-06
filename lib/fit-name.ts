@@ -5,6 +5,11 @@
 // used when it cannot load are within 1% of that (Menlo and DejaVu Sans Mono
 // 0.602em), so plan with a little slack.
 const GLYPH_ADVANCE_EM = 0.605;
+// Chrome on Linux rounds each glyph's advance to a whole pixel, so a glyph
+// can be up to half a pixel wider than its em width.
+const GLYPH_ROUNDING_PX = 0.5;
+const glyphWidth = (fontSize: number) =>
+    GLYPH_ADVANCE_EM * fontSize + GLYPH_ROUNDING_PX;
 export const ZERO_WIDTH_SPACE = "\u200B";
 
 const isLowercase = (character?: string) =>
@@ -34,7 +39,7 @@ function addBreakOpportunities(word: string) {
  * one line is set just small enough to fit.
  */
 export function fitName(name: string, width: number, fontSize: number) {
-    const maxCharacters = Math.floor(width / (GLYPH_ADVANCE_EM * fontSize));
+    const maxCharacters = Math.floor(width / glyphWidth(fontSize));
     const words = name
         .split(" ")
         .map((word) =>
@@ -50,8 +55,11 @@ export function fitName(name: string, width: number, fontSize: number) {
         text: words.join(" "),
         fontSize:
             longestPart > maxCharacters
-                ? Math.floor((width / (GLYPH_ADVANCE_EM * longestPart)) * 10) /
-                  10
+                ? Math.floor(
+                      ((width / longestPart - GLYPH_ROUNDING_PX) /
+                          GLYPH_ADVANCE_EM) *
+                          10,
+                  ) / 10
                 : fontSize,
     };
 }

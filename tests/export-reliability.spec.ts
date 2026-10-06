@@ -521,7 +521,10 @@ test("a failed font download is recovered for export", async ({
         for (let index = 0; index < expected.length; index++) {
             if (Math.abs(recovered[index] - expected[index]) > 8) differing++;
         }
-        expect(differing / expected.length).toBeLessThan(0.001);
+        // Only the short app names use the web font, so even a card drawn
+        // in a system font differs in only about 0.024% of bytes. Allow
+        // rendering noise, not that.
+        expect(differing / expected.length).toBeLessThan(0.00005);
     } finally {
         await reference.close();
     }

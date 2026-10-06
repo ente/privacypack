@@ -49,7 +49,7 @@ npm run check
 
 - `npm run test:e2e` tests the existing `out/`. Run `npm run build` first after changing the source.
 - `npm run test:e2e:dev` runs the same suite against `next dev`.
-- Stop `npm run dev` before `npm run build` or `npm run check`: they rebuild the `.next/` directory the dev server uses.
+- `npm run check` and `npm run test:e2e` serve the export on port 3000, which `npm run dev` also uses: stop the dev server or choose another port (below). `npm run test:e2e:dev` starts its own `next dev`, and Next.js 16 runs only one per checkout, so stop `npm run dev` first. `npm run build` can run while the dev server is up.
 - The test server uses port 3000. To test an existing `out/` while something else holds that port, choose another one, for example `PORT=3001 npm run test:e2e`.
 - Extra arguments go to Playwright, for example `npm run test:e2e -- tests/export-sharing.spec.ts --project=webkit`.
 
@@ -60,7 +60,7 @@ What the checks cannot prove:
 
 ### Browser support
 
-Next.js 16 compiles for Chrome, Edge and Firefox 111 and Safari 16.4 (iOS 16.4) or later, and Tailwind CSS v4 styles need Firefox 128 or later. The builder does not work in older browsers.
+Next.js 16 compiles for Chrome, Edge and Firefox 111 and Safari 16.4 or later, and Tailwind CSS v4 needs Chrome 111, Safari 16.4 (including iOS) and Firefox 128 or later. Older browsers are not supported.
 
 ### How export works
 

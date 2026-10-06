@@ -23,6 +23,10 @@ export function useTapToOpen(
         wasOpen: boolean;
     } | null>(null);
 
+    // A touch tap already acted on when the finger lifted. Some engines
+    // follow it with a click, which must not toggle the picker back.
+    const tapRef = useRef<{ key: string; time: number } | null>(null);
+
     // A press that Radix toggled the picker for on pointer-down, so the click
     // it produces must not toggle it again. It ends with that click, or when
     // the pointer is released elsewhere or cancelled, or at the next press.
@@ -81,8 +85,29 @@ export function useTapToOpen(
                     wasOpen: openKey === key,
                 };
                 // Wait for a completed tap so a swipe can scroll first.
+                // This also keeps Radix from opening the menu. WebKit 26.6
+                // then sends no click, so the tap is handled on pointer-up.
                 event.preventDefault();
             }
+        },
+        onPointerUp: (event: React.PointerEvent<HTMLButtonElement>) => {
+            const touch = touchTriggerRef.current;
+            if (event.pointerType !== "touch" || touch?.key !== key) return;
+            clearTouchTrigger();
+            // The trigger captures the touch, so check where it lifted.
+            const lifted = document.elementFromPoint(
+                event.clientX,
+                event.clientY,
+            );
+            if (!event.currentTarget.contains(lifted)) return;
+            tapRef.current = { key, time: event.timeStamp };
+            // An outside-dismissal handler can run before this. Toggle from
+            // the state at touch-start, not that later state.
+            setOpenKey(touch.wasOpen ? null : key);
+        },
+        onPointerCancel: (event: React.PointerEvent<HTMLButtonElement>) => {
+            // A swipe that scrolls cancels the touch.
+            if (event.pointerType === "touch") clearTouchTrigger();
         },
         onTouchStart: () => {
             if (touchTriggerRef.current?.key !== key) {
@@ -100,17 +125,23 @@ export function useTapToOpen(
             const pressed = pressRef.current?.key === key;
             endPress();
 
+            const tap = tapRef.current;
+            tapRef.current = null;
+            if (tap?.key === key && event.timeStamp - tap.time < 1000) {
+                event.preventDefault();
+                return;
+            }
+
             if (
                 nativeEvent.pointerType === "touch" ||
                 touchTriggerRef.current?.key === key
             ) {
+                // A touch without pointer events (or none on pointer-up).
                 event.preventDefault();
                 const wasOpen =
                     touchTriggerRef.current?.key === key
                         ? touchTriggerRef.current.wasOpen
                         : openKey === key;
-                // An outside-dismissal handler can run before this click.
-                // Toggle from the state at touch-start, not that later state.
                 setOpenKey(wasOpen ? null : key);
                 clearTouchTrigger();
             } else if (!pressed) {

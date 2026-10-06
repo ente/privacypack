@@ -122,7 +122,9 @@ for (const [alternativeCount, systemFont] of [
     test(`exports retain ${alternativeCount} ${alternativeCount === 1 ? "alternative" : "alternatives"} per category at every pack size${systemFont ? " in the system font" : ""}`, async ({
         page,
     }, testInfo) => {
-        test.setTimeout(120_000);
+        // 28 steps of about 3 seconds each locally; a CI runner managed one
+        // every 4.2 seconds and timed out at the last step of 120 seconds.
+        test.setTimeout(240_000);
         if (systemFont) {
             await page.route("**/_next/static/media/*.ttf*", (route) =>
                 route.abort("blockedbyclient"),

@@ -103,11 +103,24 @@ test("touch swipes over either picker scroll without opening a menu", async ({
             await expect(picker).toBeVisible();
             const bounds = (await picker.boundingBox())!;
 
-            await cdp.send("Input.synthesizeScrollGesture", {
-                x: bounds.x + bounds.width / 2,
-                y: bounds.y + bounds.height / 2,
-                yDistance: -400,
-                gestureSourceType: "touch",
+            // A finger drag. (Synthesized touch scroll gestures do not
+            // scroll at all in Chromium on Linux.)
+            const x = bounds.x + bounds.width / 2;
+            let y = bounds.y + bounds.height / 2;
+            await cdp.send("Input.dispatchTouchEvent", {
+                type: "touchStart",
+                touchPoints: [{ x, y }],
+            });
+            for (let step = 0; step < 20; step++) {
+                y -= 20;
+                await cdp.send("Input.dispatchTouchEvent", {
+                    type: "touchMove",
+                    touchPoints: [{ x, y }],
+                });
+            }
+            await cdp.send("Input.dispatchTouchEvent", {
+                type: "touchEnd",
+                touchPoints: [],
             });
 
             await expect

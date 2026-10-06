@@ -133,8 +133,10 @@ export function usePackImage(exportKey: string | null, paused: boolean) {
         image,
         isPreparing,
         failed,
-        // The ready image had to use a system font.
-        usesSystemFont: image !== null && !prepared!.fontLoaded,
+        // The last image had to use a system font. This holds while the next
+        // one is prepared: hiding the notice on each edit and showing it
+        // again would move the page, and any open menu, under the pointer.
+        usesSystemFont: prepared !== null && !prepared.fontLoaded,
         retry,
     };
 }

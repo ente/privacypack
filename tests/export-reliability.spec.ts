@@ -551,6 +551,42 @@ test("a blocked font still exports, in a system font, and says so", async ({
     expect(await alternativeLogoPainted(page, "proton_mail")).toBe(true);
 });
 
+test("the system font notice stays while the pack is edited, so the page does not move", async ({
+    page,
+}) => {
+    await page.route("**/_next/static/media/*.ttf*", (route) =>
+        route.abort("blockedbyclient"),
+    );
+    await page.goto("/create");
+    await selectMail(page);
+    const status = page
+        .locator('[data-export-feedback="navbar"]')
+        .getByRole("status");
+    const notice =
+        "The PrivacyPack font didn't load, so this image uses a system font.";
+    await expect(page.locator("#download-navbar")).toBeEnabled();
+    await expect(status).toHaveText(notice);
+
+    // The notice sits above the pickers. If editing hid it until the next
+    // image was ready, an open menu would jump away from the pointer.
+    const picker = page.getByRole("button", {
+        name: /^Photos private alternatives:/,
+    });
+    const top = (await picker.boundingBox())!.y;
+    await picker.click();
+    await page
+        .getByRole("menuitemcheckbox")
+        .filter({ hasText: "Ente Photos" })
+        .click();
+    await expect(status).toHaveText(notice);
+    expect((await picker.boundingBox())!.y).toBe(top);
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#download-navbar")).toBeEnabled();
+    await expect(status).toHaveText(notice);
+    expect((await picker.boundingBox())!.y).toBe(top);
+});
+
 test("glancing at a picker mid-capture does not restart the capture", async ({
     page,
 }) => {

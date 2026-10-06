@@ -283,9 +283,10 @@ test("mobile layout keeps export controls visible and disabled until selection",
 
 test("touch users can open and select a private alternative on mobile", async ({
     browser,
-}) => {
+}, testInfo) => {
     const context = await browser.newContext({
-        baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
+        baseURL: testInfo.project.use.baseURL,
+        ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
         viewport: { width: 320, height: 740 },
         isMobile: true,
         hasTouch: true,

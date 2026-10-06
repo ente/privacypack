@@ -5,6 +5,23 @@ body {
     background: #161616;
 }
 
+/* Below the sm breakpoint the export bar sticks to the bottom of the
+   viewport. Keep focused pickers scrolled clear of it. Once the page runs,
+   app/create/page.tsx sets the padding from the bar's measured height. */
+@media (max-width: 39.999rem) {
+    html {
+        scroll-padding-bottom: calc(9rem + env(safe-area-inset-bottom));
+    }
+}
+
+/* On short screens (landscape phones, 400% zoom) its buttons sit side by
+   side, so the bar covers less of the page. */
+@media (max-width: 39.999rem) and (max-height: 30rem) {
+    html {
+        scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+}
+
 .green-text {
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMwvsIAAAJFAQj8cHnTAAAAAElFTkSuQmCC")
         repeat;

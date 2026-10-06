@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { getAssetUrl } from "@/lib/assets";
 
 export default function Home() {
     return (
@@ -11,7 +12,7 @@ export default function Home() {
                 <div className="flex flex-col items-center">
                     <div className="h-[50px] w-[90px] md:h-[90px] md:w-[135px]">
                         <Image
-                            src="/logo.png"
+                            src={getAssetUrl("/logo.png")}
                             alt="Privacy Pack logo"
                             width={0}
                             height={0}
@@ -40,7 +41,7 @@ export default function Home() {
                 <div className="w-16">
                     <a href="https://ente.com/" target="_blank" rel="noopener">
                         <Image
-                            src="/ente.svg"
+                            src={getAssetUrl("/ente.svg")}
                             alt="Ente logo"
                             width={0}
                             height={0}
@@ -54,27 +55,26 @@ export default function Home() {
             <div className="flex w-[80%] flex-col items-center gap-3 md:w-[640px] xl:w-[740px]">
                 <div className="w-full">
                     <Image
-                        src="/hero.png"
+                        src={getAssetUrl("/hero.png")}
                         alt="Hero illustration"
                         width={0}
                         height={0}
                         sizes="100vw"
                         className="h-auto w-full"
                         priority
-                        quality={100}
                     />
                 </div>
             </div>
             <div className="mt-24 flex flex-row gap-5 text-sm">
                 <Link
                     href="/privacy"
-                    className="text-[#717171] underline underline-offset-4 hover:text-[#8e8e8e]"
+                    className="text-[#8a8a8a] underline underline-offset-4 hover:text-[#a8a8a8]"
                 >
                     Privacy
                 </Link>
                 <Link
                     href="/terms"
-                    className="text-[#717171] underline underline-offset-4 hover:text-[#8e8e8e]"
+                    className="text-[#8a8a8a] underline underline-offset-4 hover:text-[#a8a8a8]"
                 >
                     Terms
                 </Link>

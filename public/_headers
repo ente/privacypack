@@ -1,6 +1,9 @@
 # https://developers.cloudflare.com/pages/configuration/headers/
+# Cloudflare documents that every matching rule applies and that a header set
+# by several rules is joined with commas, so keep rules for the same header
+# from overlapping. A splat matches across "/": /*.jpg covers /app-logos/*.jpg.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://imagedelivery.net data: blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
@@ -10,29 +13,26 @@
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
 
-/app-logos/*
-  Cache-Control: public,max-age=31536000,immutable
-
 /*.ico
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.png
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.jpg
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.jpeg
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.webp
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.gif
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.svg
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate
 
 /*.avif
-  Cache-Control: public,max-age=31536000,immutable
+  Cache-Control: public,max-age=0,must-revalidate

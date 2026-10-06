@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { getAssetUrl } from "@/lib/assets";
 import "./globals.css";
 
 const jetBrainsMono = localFont({
@@ -7,7 +8,7 @@ const jetBrainsMono = localFont({
 });
 
 export const metadata: Metadata = {
-    title: "PrivacyPack",
+    title: { default: "PrivacyPack", template: "%s · PrivacyPack" },
     description:
         "Pick the mainstream apps you used before, show the privacy-respecting tools you have switched to, and share your privacy wins!",
     openGraph: {
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
         siteName: "PrivacyPack",
         images: [
             {
-                url: "https://privacypack.org/og-image.png",
+                url: `https://privacypack.org${getAssetUrl("/og-image.png")}`,
                 width: 1200,
                 height: 630,
                 alt: "PrivacyPack Preview",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
         title: "PrivacyPack",
         description:
             "Pick the mainstream apps you used before, show the privacy-respecting tools you have switched to, and share your privacy wins!",
-        images: ["https://privacypack.org/og-image.png"],
+        images: [`https://privacypack.org${getAssetUrl("/og-image.png")}`],
     },
 };
 

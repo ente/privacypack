@@ -1,165 +1,158 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import { PRIVACY_PACK_FONT_FAMILY } from "@/lib/utils";
+import { getAssetUrl } from "@/lib/assets";
+import { PRIVACY_PACK_FONT_FAMILY } from "@/lib/export-image";
+import { fitName } from "@/lib/fit-name";
+import type { AppOption as AppLogo, PackItem } from "@/lib/pack";
 
 interface PrivacyPackResultProps {
-    pack: Array<{
-        category: string;
-        order: number;
-        mainstream_app_name: string;
-        mainstream_app_id: string;
-        private_alternatives: Array<{
-            id: string;
-            name: string;
-        }>;
-    }>;
+    pack: PackItem[];
 }
 
-type AppLogo = {
-    id: string;
-    name: string;
-};
+// The cards sit between 48px insets on the 1500px canvas.
+const CARD_AREA_WIDTH = 1500 - 2 * 48;
+const DENSE_COLUMN_GAP = 22;
+// Dense cards share four columns and have 12px padding and a 1px border.
+const DENSE_CARD_CONTENT_WIDTH =
+    (CARD_AREA_WIDTH - 3 * DENSE_COLUMN_GAP) / 4 - 2 * 12 - 2 * 1;
+// Space between a small alternative logo and its name (gap-1.5).
+const ALTERNATIVE_ROW_GAP = 6;
 
 const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
     const smallColumnCount = Math.max(1, Math.min(pack.length, 3));
     const layout =
         pack.length <= 12
             ? {
-                  kind: "classic",
+                  dense: false,
                   gridTop: "200px",
                   gridTemplateColumns: `repeat(${smallColumnCount}, 380px)`,
-                  justifyContent: "center",
                   columnGap: "110px",
                   rowGap: "56px",
                   cardClass: "h-[270px] w-[380px] pt-6",
-                  logoClass: "h-[150px] w-[150px]",
-                  textClass: "max-w-[150px] text-[28px]",
-                  multiTextClass: "max-w-[190px] text-[22px]",
-                  arrowClass: "-mt-20",
-                  arrowSize: 42,
+                  contentClass: "grid h-full items-center gap-x-2",
+                  columns: "150px 32px 180px",
+                  mainstreamWidth: 150,
+                  alternativesWidth: 180,
+                  logoSize: 140,
+                  fontSize: 22,
+                  alternativeLogoSize: 40,
+                  alternativeFontSize: 16,
+                  alternativeGapClass: "gap-2",
+                  arrowSize: 32,
               }
             : pack.length <= 20
               ? {
-                    kind: "classic",
+                    dense: false,
                     gridTop: "180px",
                     gridTemplateColumns: "repeat(4, 290px)",
-                    justifyContent: "center",
                     columnGap: "72px",
                     rowGap: "52px",
                     cardClass: "h-[190px] w-[290px] pt-6",
-                    logoClass: "h-[120px] w-[120px]",
-                    textClass: "max-w-[120px] text-[25px]",
-                    multiTextClass: "max-w-[150px] text-[18px]",
-                    arrowClass: "-mt-12",
-                    arrowSize: 32,
+                    contentClass: "grid h-full items-center gap-x-[5px]",
+                    columns: "120px 20px 140px",
+                    mainstreamWidth: 120,
+                    alternativesWidth: 140,
+                    logoSize: 90,
+                    fontSize: 18,
+                    alternativeLogoSize: 30,
+                    alternativeFontSize: 13,
+                    alternativeGapClass: "gap-1.5",
+                    arrowSize: 20,
                 }
               : {
-                    kind: "dense",
+                    dense: true,
                     gridTop: "142px",
                     gridTemplateColumns: "repeat(4, 1fr)",
-                    justifyContent: "normal",
-                    columnGap: "22px",
+                    columnGap: `${DENSE_COLUMN_GAP}px`,
                     rowGap: "18px",
                     cardClass:
                         "h-[166px] w-full rounded-lg border border-white/8 bg-[#181818] px-3 py-2.5",
-                    logoClass: "h-[66px] w-[66px]",
-                    textClass: "max-w-[118px] text-[15px]",
-                    multiTextClass: "max-w-[118px] text-[14px]",
-                    arrowClass: "",
+                    contentClass: "grid min-h-0 flex-1 items-center gap-x-2",
+                    columns: "100px 22px minmax(0,1fr)",
+                    mainstreamWidth: 100,
+                    // The remainder after both fixed columns and two 8px gaps.
+                    alternativesWidth: DENSE_CARD_CONTENT_WIDTH - 100 - 22 - 16,
+                    logoSize: 66,
+                    fontSize: 15,
+                    alternativeLogoSize: 28,
+                    alternativeFontSize: 14,
+                    alternativeGapClass: "gap-1",
                     arrowSize: 22,
                 };
 
-    const getAlternativeLabel = (
-        alternatives: Array<{ id: string; name: string }>,
-        compact = false,
-    ) => {
-        if (compact && alternatives.length > 1) {
-            return `${alternatives[0].name} +${alternatives.length - 1}`;
-        }
-
-        return alternatives.map((alternative) => alternative.name).join(" + ");
-    };
-
-    const renderLogo = (app: AppLogo, logoClass: string) => (
-        <div className={logoClass}>
+    const renderLogo = (app: AppLogo, size: number) => (
+        <div className="shrink-0" style={{ width: size, height: size }}>
             <Image
-                src={`/app-logos/${app.id}.jpg`}
+                src={getAssetUrl(`/app-logos/${app.id}.jpg`)}
                 alt={app.name}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="h-full w-full rounded-2xl object-cover"
+                width={size}
+                height={size}
+                sizes={`${size}px`}
+                className="h-full w-full rounded-xl object-cover"
             />
         </div>
     );
 
-    const renderDenseAlternativeLogo = (
-        alternatives: Array<{ id: string; name: string }>,
+    const renderName = (
+        name: string,
+        width: number,
+        fontSize: number,
+        className: string,
     ) => {
-        const [primary, secondary] = alternatives;
-
-        if (!secondary) {
-            return renderLogo(primary, layout.logoClass);
-        }
+        const fitted = fitName(name, width, fontSize);
 
         return (
-            <div className={`${layout.logoClass} relative`}>
-                <Image
-                    src={`/app-logos/${primary.id}.jpg`}
-                    alt={primary.name}
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    className="h-full w-full rounded-2xl object-cover"
-                />
-                <div className="absolute -right-1 -bottom-1 h-[34px] w-[34px] overflow-hidden rounded-lg border-[3px] border-[#181818] bg-[#181818]">
-                    <Image
-                        src={`/app-logos/${secondary.id}.jpg`}
-                        alt={secondary.name}
-                        width={0}
-                        height={0}
-                        sizes="40px"
-                        className="h-full w-full object-cover"
-                    />
-                </div>
-                {alternatives.length > 2 ? (
-                    <div className="absolute -top-1 -right-1 flex h-[25px] min-w-[25px] items-center justify-center rounded-full bg-[#00d51b] px-1 text-[12px] leading-none font-bold text-[#111111]">
-                        +{alternatives.length - 1}
-                    </div>
-                ) : null}
+            <div
+                className={`${className} leading-[1.12] break-words text-[#aeaeae]`}
+                style={{ fontSize: fitted.fontSize }}
+            >
+                {fitted.text}
             </div>
         );
     };
 
-    const renderClassicAlternativeLogo = (
-        alternatives: Array<{ id: string; name: string }>,
-    ) => {
-        const hasMultipleAlternatives = alternatives.length > 1;
+    const renderAlternatives = (alternatives: AppLogo[]) => {
+        if (alternatives.length === 1) {
+            const alternative = alternatives[0];
 
-        if (!hasMultipleAlternatives) {
-            return renderLogo(alternatives[0], layout.logoClass);
+            return (
+                <div
+                    data-pack-alternative={alternative.id}
+                    className="flex min-w-0 flex-col items-center"
+                >
+                    {renderLogo(alternative, layout.logoSize)}
+                    {renderName(
+                        alternative.name,
+                        layout.alternativesWidth,
+                        layout.fontSize,
+                        "mt-2 w-full text-center",
+                    )}
+                </div>
+            );
         }
 
         return (
-            <div className={layout.logoClass}>
-                <div className="grid h-full w-full grid-cols-2 place-items-center gap-2">
-                    {alternatives.map((alternative) => (
-                        <div
-                            key={alternative.id}
-                            className="aspect-square w-full overflow-hidden rounded-xl bg-white/5"
-                        >
-                            <Image
-                                src={`/app-logos/${alternative.id}.jpg`}
-                                alt={alternative.name}
-                                width={0}
-                                height={0}
-                                sizes="120px"
-                                className="h-full w-full object-contain"
-                            />
-                        </div>
-                    ))}
-                </div>
+            <div
+                className={`flex min-w-0 flex-col ${layout.alternativeGapClass}`}
+            >
+                {alternatives.map((alternative) => (
+                    <div
+                        key={alternative.id}
+                        data-pack-alternative={alternative.id}
+                        className="flex min-w-0 items-center gap-1.5"
+                    >
+                        {renderLogo(alternative, layout.alternativeLogoSize)}
+                        {renderName(
+                            alternative.name,
+                            layout.alternativesWidth -
+                                layout.alternativeLogoSize -
+                                ALTERNATIVE_ROW_GAP,
+                            layout.alternativeFontSize,
+                            "min-w-0 flex-1",
+                        )}
+                    </div>
+                ))}
             </div>
         );
     };
@@ -195,10 +188,10 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
                     }}
                 >
                     <Image
-                        src="/url-logo.png"
+                        src={getAssetUrl("/url-logo.png")}
                         alt="PrivacyPack Logo"
                         width={474}
-                        height={72}
+                        height={75}
                     />
                 </div>
 
@@ -212,11 +205,10 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
                     }}
                 >
                     <Image
-                        src="/small-logo.png"
+                        src={getAssetUrl("/small-logo.png")}
                         alt="Privacy Pack logo"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
+                        width={140}
+                        height={103}
                         className="h-auto w-full"
                     />
                 </div>
@@ -230,109 +222,50 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
                     right: "48px",
                     display: "grid",
                     gridTemplateColumns: layout.gridTemplateColumns,
-                    justifyContent: layout.justifyContent,
+                    justifyContent: layout.dense ? "normal" : "center",
                     columnGap: layout.columnGap,
                     rowGap: layout.rowGap,
-                    justifyItems:
-                        layout.kind === "dense" ? "stretch" : "center",
+                    justifyItems: layout.dense ? "stretch" : "center",
                 }}
             >
-                {pack.map((item) => {
-                    const alternatives = item.private_alternatives;
-                    const hasMultipleAlternatives = alternatives.length > 1;
-
-                    if (layout.kind === "dense") {
-                        return (
-                            <div
-                                key={item.category}
-                                className={`${layout.cardClass} flex flex-col`}
-                            >
-                                <div className="mb-2 text-center text-[12px] leading-none font-semibold text-[#777777]">
-                                    {item.category}
-                                </div>
-                                <div className="flex min-h-0 flex-1 items-start justify-between gap-2">
-                                    <div className="flex h-full w-[118px] min-w-0 flex-col items-center">
-                                        {renderLogo(
-                                            {
-                                                id: item.mainstream_app_id,
-                                                name: item.mainstream_app_name,
-                                            },
-                                            layout.logoClass,
-                                        )}
-                                        <div
-                                            className={`${layout.textClass} mt-2 text-center leading-[1.12] break-words text-[#b7b7b7]`}
-                                        >
-                                            {item.mainstream_app_name}
-                                        </div>
-                                    </div>
-                                    <div className="flex h-[72px] shrink-0 items-center pt-3">
-                                        <ArrowRight
-                                            size={layout.arrowSize}
-                                            className="text-[#d8d8d8]"
-                                        />
-                                    </div>
-                                    <div className="flex h-full w-[118px] min-w-0 flex-col items-center">
-                                        {renderDenseAlternativeLogo(
-                                            alternatives,
-                                        )}
-                                        <div
-                                            className={`${
-                                                hasMultipleAlternatives
-                                                    ? layout.multiTextClass
-                                                    : layout.textClass
-                                            } mt-2 text-center leading-[1.12] break-words text-[#b7b7b7]`}
-                                        >
-                                            {getAlternativeLabel(
-                                                alternatives,
-                                                true,
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                {pack.map((item) => (
+                    <div
+                        key={item.category}
+                        data-pack-category={item.category}
+                        className={`${layout.cardClass} flex flex-col`}
+                    >
+                        {layout.dense ? (
+                            <div className="mb-2 text-center text-[12px] leading-none font-semibold text-[#8a8a8a]">
+                                {item.category}
                             </div>
-                        );
-                    }
-
-                    return (
+                        ) : null}
                         <div
-                            key={item.category}
-                            className={`${layout.cardClass} group relative flex flex-row items-center justify-between rounded-md transition`}
+                            className={layout.contentClass}
+                            style={{ gridTemplateColumns: layout.columns }}
                         >
-                            <div className="flex h-full flex-col items-center transition outline-none">
+                            <div className="flex min-w-0 flex-col items-center">
                                 {renderLogo(
                                     {
                                         id: item.mainstream_app_id,
                                         name: item.mainstream_app_name,
                                     },
-                                    layout.logoClass,
+                                    layout.logoSize,
                                 )}
-                                <div
-                                    className={`${layout.textClass} mt-3 text-center leading-tight break-words text-[#aeaeae]`}
-                                >
-                                    {item.mainstream_app_name}
-                                </div>
+                                {renderName(
+                                    item.mainstream_app_name,
+                                    layout.mainstreamWidth,
+                                    layout.fontSize,
+                                    "mt-2 w-full text-center",
+                                )}
                             </div>
-                            <div className={layout.arrowClass}>
-                                <ArrowRight
-                                    size={layout.arrowSize}
-                                    className="text-[#e6e6e6]"
-                                />
-                            </div>
-                            <div className="flex h-full flex-col items-center transition outline-none">
-                                {renderClassicAlternativeLogo(alternatives)}
-                                <div
-                                    className={`${
-                                        hasMultipleAlternatives
-                                            ? layout.multiTextClass
-                                            : layout.textClass
-                                    } mt-3 text-center leading-tight break-words text-[#aeaeae]`}
-                                >
-                                    {getAlternativeLabel(alternatives)}
-                                </div>
-                            </div>
+                            <ArrowRight
+                                size={layout.arrowSize}
+                                className="text-[#e6e6e6]"
+                            />
+                            {renderAlternatives(item.private_alternatives)}
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </div>
         </div>
     );

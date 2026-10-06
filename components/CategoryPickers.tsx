@@ -64,13 +64,14 @@ export default function CategoryPickers({
     // A menu still animating closed treats a tap on its own trigger as an
     // outside tap and would close the menu that tap just reopened. The
     // trigger toggles its menu itself, so ignore those.
-    const ignoreOwnTrigger =
-        (trigger: React.RefObject<HTMLButtonElement | null>) =>
-        (event: Event) => {
-            if (trigger.current?.contains(event.target as Node)) {
-                event.preventDefault();
-            }
-        };
+    const ignoreOwnTrigger = (
+        event: Event,
+        trigger: React.RefObject<HTMLButtonElement | null>,
+    ) => {
+        if (trigger.current?.contains(event.target as Node)) {
+            event.preventDefault();
+        }
+    };
     const selected = item.private_alternatives;
     const mainKey = `${item.category}-main`;
     const altKey = `${item.category}-alt`;
@@ -119,7 +120,9 @@ export default function CategoryPickers({
                         onCloseAutoFocus={(event) =>
                             onCloseAutoFocus(event, mainKey)
                         }
-                        onPointerDownOutside={ignoreOwnTrigger(mainTriggerRef)}
+                        onPointerDownOutside={(event) =>
+                            ignoreOwnTrigger(event, mainTriggerRef)
+                        }
                         align="start"
                         side="bottom"
                         collisionPadding={menuCollisionPadding}
@@ -229,7 +232,9 @@ export default function CategoryPickers({
                         onCloseAutoFocus={(event) =>
                             onCloseAutoFocus(event, altKey)
                         }
-                        onPointerDownOutside={ignoreOwnTrigger(altTriggerRef)}
+                        onPointerDownOutside={(event) =>
+                            ignoreOwnTrigger(event, altTriggerRef)
+                        }
                         align="end"
                         side="bottom"
                         collisionPadding={menuCollisionPadding}

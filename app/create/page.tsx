@@ -114,6 +114,9 @@ export default function App() {
             );
             share?.focus();
         }
+        // A deliberate re-render before paint: Retry unmounts only after
+        // focus has moved off it.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRetryPending(false);
     }, [retryPending, readyImage, preparationFailed]);
 

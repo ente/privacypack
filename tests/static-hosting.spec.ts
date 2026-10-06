@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Request } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -35,9 +35,17 @@ test("building, downloading and sharing a pack stays in the browser", async ({
         if (url.protocol !== "data:") {
             requests.push(`${request.method()} ${url.origin}${url.pathname}`);
         }
-        if (request.method() !== "GET" || request.postData() !== null) {
+        // Next's router checks a link target with a bodiless HEAD request.
+        if (
+            !["GET", "HEAD"].includes(request.method()) ||
+            request.postData() !== null
+        ) {
             uploads.push(`${request.method()} ${request.url()}`);
         }
+    });
+    const answered = new WeakSet<Request>();
+    page.on("response", (response) => {
+        if (response.ok()) answered.add(response.request());
     });
     page.on("requestfailed", (request) => {
         const error = request.failure()?.errorText ?? "";
@@ -45,7 +53,14 @@ test("building, downloading and sharing a pack stays in the browser", async ({
         const cancelledByRouter =
             new URL(request.url()).searchParams.has("_rsc") &&
             /ERR_ABORTED|cancelled/i.test(error);
-        if (!cancelledByRouter) failures.push(`${request.url()} ${error}`);
+        // Chromium reports a HEAD request it got a response to as aborted.
+        const answeredHead =
+            request.method() === "HEAD" &&
+            answered.has(request) &&
+            /ERR_ABORTED/.test(error);
+        if (!cancelledByRouter && !answeredHead) {
+            failures.push(`${request.url()} ${error}`);
+        }
     });
     page.on("console", (message) => {
         if (message.type() === "error") errors.push(message.text());
@@ -99,16 +114,21 @@ test("building, downloading and sharing a pack stays in the browser", async ({
                 (window as typeof window & { violations: string[] }).violations,
         ),
     ).toEqual([]);
-    expect(
-        await page.evaluate(async () => ({
-            localStorage: localStorage.length,
-            sessionStorage: sessionStorage.length,
-            cookies: document.cookie,
-            indexedDB:
-                (await indexedDB.databases?.())?.map(({ name }) => name) ?? [],
-            caches: "caches" in window ? await caches.keys() : [],
-        })),
-    ).toEqual({
+    const storage = await page.evaluate(async () => ({
+        localStorage: localStorage.length,
+        sessionStorage: sessionStorage.length,
+        cookies: document.cookie,
+        indexedDB:
+            (await indexedDB.databases?.())?.map(({ name }) => name) ?? [],
+        caches: "caches" in window ? await caches.keys() : [],
+    }));
+    // The Next.js dev tools keep a database; the exported site must not.
+    if (!production) {
+        storage.indexedDB = storage.indexedDB.filter(
+            (name) => name !== "__next_debug_channel",
+        );
+    }
+    expect(storage).toEqual({
         localStorage: 0,
         sessionStorage: 0,
         cookies: "",
@@ -179,9 +199,20 @@ test.describe("local emulation of public/_headers", () => {
             );
         }
 
-        expect((await request.get(script)).headers()["cache-control"]).toBe(
-            "public,max-age=31536000,immutable",
-        );
+        // Every build file is immutable, whatever its type: no other rule
+        // may add a second Cache-Control value to one.
+        const staticDir = path.join(process.cwd(), "out", "_next", "static");
+        const buildFiles = (
+            fs.readdirSync(staticDir, { recursive: true }) as string[]
+        ).filter((file) => fs.statSync(path.join(staticDir, file)).isFile());
+        expect(buildFiles.map((file) => path.extname(file))).toContain(".js");
+        for (const file of buildFiles) {
+            const url = `/_next/static/${file.split(path.sep).join("/")}`;
+            expect(
+                (await request.get(url)).headers()["cache-control"],
+                url,
+            ).toBe("public,max-age=31536000,immutable");
+        }
         for (const url of [logo, "/og-image.png", "/favicon.ico"]) {
             expect(
                 (await request.get(url)).headers()["cache-control"],

@@ -58,6 +58,10 @@ What the checks cannot prove:
 - The header and routing tests use the local emulation of `_headers`, not Cloudflare Pages itself. For example, the live site redirects `/create/` and `/create.html` to `/create` (308), which the local server does not. Check headers, redirects and 404s on a deployment.
 - The Web Share API and clipboard are stubbed in the browser tests. They show how the app handles each outcome, not that an operating system share sheet delivers the PNG. Check sharing on real iOS and Android devices.
 
+### Browser support
+
+Next.js 16 compiles for Chrome, Edge and Firefox 111 and Safari 16.4 (iOS 16.4) or later, and Tailwind CSS v4 styles need Firefox 128 or later. The builder does not work in older browsers.
+
 ### How export works
 
 The card is drawn in the browser from the hidden `components/PrivacyPackResult.tsx` with html2canvas into a 3000×3000 PNG. Nothing is uploaded. An image is prepared after each change, once no picker is open, so that Share can call the Web Share API directly from the tap. Without file sharing, Share copies the image to the clipboard, or downloads it.

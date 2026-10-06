@@ -42,3 +42,5 @@ Thumbs.db
 /.codex/
 /.claude/
 /CLAUDE.md
+# Written by `next dev` when it detects an AI coding agent.
+/AGENTS.md

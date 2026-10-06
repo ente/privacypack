@@ -4,7 +4,7 @@ import { getAssetUrl } from "@/lib/assets";
 import "./globals.css";
 
 const jetBrainsMono = localFont({
-    src: "/JetBrainsMono.ttf",
+    src: "./JetBrainsMono.ttf",
 });
 
 export const metadata: Metadata = {

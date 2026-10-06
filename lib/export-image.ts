@@ -73,6 +73,22 @@ function getPrivacyPackFontFaceRules() {
     return fontFaceRules;
 }
 
+const CSS_URL = /url\(\s*(["']?)([^"')]+)\1\s*\)/g;
+
+/**
+ * A rule's text with its URLs made absolute. Copied out of its stylesheet, a
+ * relative URL (Turbopack writes `../media/...`) would resolve against the
+ * page instead.
+ */
+function absoluteRuleText(rule: CSSFontFaceRule) {
+    const base = rule.parentStyleSheet?.href ?? document.baseURI;
+    return rule.cssText.replace(
+        CSS_URL,
+        (_, quote: string, url: string) =>
+            `url(${quote}${new URL(url, base).href}${quote})`,
+    );
+}
+
 /**
  * Without the web font the capture must not name it at all: a download that
  * finishes mid-render would otherwise mix fonts, and html2canvas waits for
@@ -106,7 +122,7 @@ function injectPrivacyPackFontStyles(clonedDoc: Document, fontLoaded: boolean) {
         ? []
         : recoveredFont
           ? [recoveredFont.rule]
-          : getPrivacyPackFontFaceRules().map((rule) => rule.cssText);
+          : getPrivacyPackFontFaceRules().map(absoluteRuleText);
     const style = clonedDoc.createElement("style");
     style.setAttribute("data-privacypack-export-font", "true");
     style.textContent = [
@@ -214,15 +230,13 @@ async function recoverExportFont(signal?: AbortSignal) {
     if (!failed) return;
 
     const rule = getPrivacyPackFontFaceRules().find(isPrimaryFontRule);
-    const source = rule?.style
-        .getPropertyValue("src")
-        .match(/url\(\s*["']?([^"')]+)["']?\s*\)/)?.[1];
-    if (!rule || !source) throw new ExportFontError();
+    const ruleText = rule && absoluteRuleText(rule);
+    const source = ruleText && new RegExp(CSS_URL.source).exec(ruleText)?.[2];
+    if (!rule || !ruleText || !source) throw new ExportFontError();
 
     fontRecoveryAttempt += 1;
     const url = `${source}${source.includes("?") ? "&" : "?"}retry=${fontRecoveryAttempt}`;
-    const src = rule.style.getPropertyValue("src").replace(source, url);
-    const face = new FontFace(PRIVACY_PACK_FONT, src, {
+    const face = new FontFace(PRIVACY_PACK_FONT, `url("${url}")`, {
         display: (rule.style.getPropertyValue("font-display") ||
             "auto") as FontDisplay,
     });
@@ -239,7 +253,7 @@ async function recoverExportFont(signal?: AbortSignal) {
     document.fonts.add(face);
     recoveredFont = {
         face,
-        rule: rule.cssText.replace(source, url),
+        rule: ruleText.replace(source, url),
     };
 }
 

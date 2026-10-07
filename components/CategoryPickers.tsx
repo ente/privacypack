@@ -26,7 +26,7 @@ import {
 const triggerClassName =
     "flex h-full cursor-pointer touch-pan-y flex-col items-center rounded-2xl bg-[#2B2B2B] p-4 text-[#aeaeae] transition outline-none hover:bg-[#ededed] focus-visible:outline-hidden hover:text-black focus:bg-[#ededed] focus:text-black data-[state=open]:bg-[#ededed] data-[state=open]:text-black md:rounded-3xl";
 const triggerNameClassName =
-    "mt-5 max-w-18 text-center text-xs leading-tight font-medium break-words lg:max-w-24 lg:text-base xl:max-w-28 2xl:max-w-40";
+    "mt-5 max-w-18 text-center text-xs leading-tight font-medium break-words lg:max-w-24 lg:text-base picker-xl:max-w-28 picker-2xl:max-w-40";
 
 const logoSrc = (id: string) => getAssetUrl(`/app-logos/${id}.jpg`);
 
@@ -98,7 +98,7 @@ export default function CategoryPickers({
                             {...getTriggerHandlers(mainKey)}
                             className={triggerClassName}
                         >
-                            <div className="h-18 w-18 lg:h-24 lg:w-24 xl:h-28 xl:w-28 2xl:h-40 2xl:w-40">
+                            <div className="picker-xl:h-28 picker-xl:w-28 picker-2xl:h-40 picker-2xl:w-40 h-18 w-18 lg:h-24 lg:w-24">
                                 <Image
                                     src={logoSrc(item.mainstream_app_id)}
                                     alt=""
@@ -165,7 +165,8 @@ export default function CategoryPickers({
                 </DropdownMenu>
 
                 <ArrowRight
-                    className="text-[#aeaeae] transition"
+                    data-picker-arrow
+                    className="shrink-0 text-[#aeaeae] transition"
                     aria-hidden="true"
                 />
 
@@ -183,7 +184,7 @@ export default function CategoryPickers({
                             className={triggerClassName}
                         >
                             <div
-                                className={`h-18 w-18 rounded-xl md:rounded-2xl lg:h-24 lg:w-24 xl:h-28 xl:w-28 2xl:h-40 2xl:w-40 ${
+                                className={`picker-xl:h-28 picker-xl:w-28 picker-2xl:h-40 picker-2xl:w-40 h-18 w-18 rounded-xl md:rounded-2xl lg:h-24 lg:w-24 ${
                                     selected.length === 0 ? "bg-[#383838]" : ""
                                 } ${
                                     selected.length > 1

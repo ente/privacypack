@@ -32,6 +32,13 @@ body {
 
 @theme inline {
     --breakpoint-xs: 24rem;
+    /* The create page's pickers go to three columns, then to their largest
+       logos, only once those fit: three cards (25rem, then 31rem) and two
+       gaps (5rem, then 10rem), plus the page's 2rem padding and 2rem for a
+       scrollbar. Any narrower and the arrows between the pickers are
+       squeezed out and the grid overflows the page. */
+    --breakpoint-picker-xl: 89rem;
+    --breakpoint-picker-2xl: 117rem;
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);

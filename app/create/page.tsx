@@ -313,7 +313,7 @@ export default function App() {
                     messageClassName="mt-4"
                 />
 
-                <main className="mt-16 mb-10 grid grid-cols-1 gap-14 sm:mx-auto md:grid-cols-2 md:gap-20 lg:my-24 lg:gap-28 xl:my-24 xl:grid-cols-3 xl:gap-20 2xl:my-32 2xl:gap-40">
+                <main className="picker-xl:my-24 picker-xl:grid-cols-3 picker-xl:gap-20 picker-2xl:my-32 picker-2xl:gap-40 mt-16 mb-10 grid grid-cols-1 gap-14 sm:mx-auto md:grid-cols-2 md:gap-20 lg:my-24 lg:gap-28">
                     <h1 className="sr-only">Create your PrivacyPack</h1>
                     {pack.map((item) => (
                         <CategoryPickers

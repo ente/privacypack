@@ -119,7 +119,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "matrix", "name": "Matrix" }
             ]
         },
         {

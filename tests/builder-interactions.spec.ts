@@ -250,6 +250,7 @@ test("completed touch taps open pickers and allow selection and dismissal", asyn
         isMobile: true,
         hasTouch: true,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
     });
 
     try {
@@ -400,6 +401,7 @@ test("tapping an export button while a picker is open closes it and prepares the
     const context = await browser.newContext({
         baseURL: testInfo.project.use.baseURL,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
         viewport: { width: 390, height: 844 },
         isMobile: true,
         hasTouch: true,
@@ -526,6 +528,9 @@ test("Remove is set apart, names its category, and is disabled when empty", asyn
 test("a picker reopened while its menu is still closing stays open", async ({
     page,
 }) => {
+    // Linux WebKit runs with reduced motion (playwright.config.ts), where a
+    // menu closes at once.
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/create");
     const picker = page.getByRole("button", {
         name: /^Mail private alternatives:/,
@@ -580,6 +585,7 @@ test("an open menu stays above the mobile export bar", async ({
     const context = await browser.newContext({
         baseURL: testInfo.project.use.baseURL,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
         viewport: { width: 390, height: 844 },
         isMobile: true,
         hasTouch: true,

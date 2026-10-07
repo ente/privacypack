@@ -26,7 +26,20 @@ export default defineConfig({
     },
     projects: [
         { name: "chromium", use: { browserName: "chromium" } },
-        { name: "webkit", use: { browserName: "webkit" } },
+        {
+            name: "webkit",
+            use: {
+                browserName: "webkit",
+                // Playwright's WebKit on Linux can crash its web process
+                // when a menu item is clicked while the menu is still
+                // animating open (seen on CI). Reduced motion turns the
+                // menu animations off there. Chromium and macOS WebKit
+                // still run them, and tests that rely on them opt back in.
+                ...(process.platform === "linux" && {
+                    reducedMotion: "reduce",
+                }),
+            },
+        },
     ],
     webServer: process.env.PLAYWRIGHT_BASE_URL
         ? undefined

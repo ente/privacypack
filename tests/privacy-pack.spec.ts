@@ -294,6 +294,7 @@ test("touch users can open and select a private alternative on mobile", async ({
     const context = await browser.newContext({
         baseURL: testInfo.project.use.baseURL,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
         viewport: { width: 320, height: 740 },
         isMobile: true,
         hasTouch: true,

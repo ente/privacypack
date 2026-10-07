@@ -508,6 +508,7 @@ test("a failed font download is recovered for export", async ({
     const reference = await browser.newPage({
         baseURL: testInfo.project.use.baseURL,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
     });
     try {
         await reference.goto("/create");

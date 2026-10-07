@@ -298,6 +298,7 @@ test("menus open and close at once for reduced motion", async ({ page }) => {
 test("menus still animate with no reduced motion preference", async ({
     page,
 }) => {
+    // Linux WebKit runs with reduced motion (playwright.config.ts).
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/create");
     // The keyboard-opened menu below needs the page hydrated.

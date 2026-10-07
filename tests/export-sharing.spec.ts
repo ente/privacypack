@@ -257,6 +257,7 @@ test("mobile share feedback is visible from the bottom of the page", async ({
     const context = await browser.newContext({
         baseURL: testInfo.project.use.baseURL,
         ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
         viewport: { width: 320, height: 640 },
         isMobile: true,
         hasTouch: true,

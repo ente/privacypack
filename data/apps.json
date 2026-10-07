@@ -479,7 +479,8 @@
                 { "id": "adguard", "name": "AdGuard DNS" },
                 { "id": "quad9", "name": "Quad9 DNS" },
                 { "id": "mullvad_dns", "name": "Mullvad DNS" },
-                { "id": "opennic", "name": "OpenNIC" }
+                { "id": "opennic", "name": "OpenNIC" },
+                { "id": "unbound", "name": "Unbound" }
             ]
         },
         {

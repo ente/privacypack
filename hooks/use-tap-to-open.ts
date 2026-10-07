@@ -44,7 +44,13 @@ export function useTapToOpen(
         onPointerDownCapture: (
             event: React.PointerEvent<HTMLButtonElement>,
         ) => {
-            if (event.pointerType !== "touch") return;
+            // A touch that ends without a tap, such as a sideways drag, sends
+            // no click and leaves its state behind. A mouse or pen press must
+            // not toggle from that state.
+            if (event.pointerType !== "touch") {
+                clearTouchTrigger();
+                return;
+            }
             touchTriggerRef.current = { key, wasOpen: openKey === key };
             // Wait for a completed tap so a swipe can scroll first: keep the
             // touch from Radix, which opens the menu on pointer-down. Stop
@@ -96,12 +102,18 @@ export function useTapToOpen(
             }
         },
         onTouchCancel: clearTouchTrigger,
+        // A swipe that scrolls cancels the pointer, but Chromium does not
+        // cancel the touch.
+        onPointerCancel: clearTouchTrigger,
         onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
             const nativeEvent = event.nativeEvent as MouseEvent & {
                 pointerType?: string;
             };
             const pressed = pressRef.current?.key === key;
             endPress();
+            // A click with no press behind it (assistive technology) did not
+            // come from a touch, so any touch state left here is stale.
+            if (nativeEvent.detail === 0) clearTouchTrigger();
 
             if (
                 nativeEvent.pointerType === "touch" ||

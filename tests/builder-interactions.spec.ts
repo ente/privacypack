@@ -134,6 +134,112 @@ test("touch swipes over either picker scroll without opening a menu", async ({
     }
 });
 
+test("touches that end without a tap do not reverse a later click", async ({
+    browser,
+    browserName,
+    baseURL,
+}, testInfo) => {
+    test.skip(browserName !== "chromium", "Native drags use Chromium CDP.");
+
+    // A touch screen and a mouse on one device.
+    const context = await browser.newContext({
+        baseURL,
+        viewport: { width: 1280, height: 900 },
+        hasTouch: true,
+        ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+    });
+
+    try {
+        const page = await context.newPage();
+        const cdp = await context.newCDPSession(page);
+        await page.goto("/create");
+        await page.waitForLoadState("networkidle");
+        const picker = page.locator(
+            'button[aria-label^="Mail private alternatives:"]',
+        );
+
+        // A finger drag across the middle of the picker, ending on it.
+        const drag = async (dx: number, dy: number) => {
+            const bounds = (await picker.boundingBox())!;
+            const x = bounds.x + bounds.width / 2 - dx / 2;
+            const y = bounds.y + bounds.height / 2 - dy / 2;
+            await cdp.send("Input.dispatchTouchEvent", {
+                type: "touchStart",
+                touchPoints: [{ x, y }],
+            });
+            for (let step = 1; step <= 8; step++) {
+                await cdp.send("Input.dispatchTouchEvent", {
+                    type: "touchMove",
+                    touchPoints: [
+                        { x: x + (dx * step) / 8, y: y + (dy * step) / 8 },
+                    ],
+                });
+            }
+            await cdp.send("Input.dispatchTouchEvent", {
+                type: "touchEnd",
+                touchPoints: [],
+            });
+        };
+        const clickPicker = async () => {
+            const bounds = (await picker.boundingBox())!;
+            await page.mouse.click(
+                bounds.x + bounds.width / 2,
+                bounds.y + bounds.height / 2,
+            );
+        };
+
+        // A sideways drag neither scrolls nor taps. Dismissed after it, the
+        // picker opens on the next click.
+        for (const dismiss of [
+            () => page.keyboard.press("Escape"),
+            () => page.mouse.click(16, 95),
+        ]) {
+            await picker.tap();
+            await expect(picker).toHaveAttribute("aria-expanded", "true");
+            await drag(80, 0);
+            await dismiss();
+            await expect(page.getByRole("menu")).toHaveCount(0);
+            await clickPicker();
+            await expect(picker).toHaveAttribute("aria-expanded", "true");
+            await page.keyboard.press("Escape");
+            await expect(page.getByRole("menu")).toHaveCount(0);
+        }
+
+        // Opened from the keyboard after a drag, it closes on the next click.
+        await drag(80, 0);
+        await picker.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(picker).toHaveAttribute("aria-expanded", "true");
+        await clickPicker();
+        await expect(page.getByRole("menu")).toHaveCount(0);
+        await expect(picker).toHaveAttribute("aria-expanded", "false");
+
+        // And on a bare click from assistive technology, which comes with no
+        // press to clear the drag's state.
+        await drag(80, 0);
+        await picker.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(picker).toHaveAttribute("aria-expanded", "true");
+        await picker.evaluate((element) => (element as HTMLElement).click());
+        await expect(page.getByRole("menu")).toHaveCount(0);
+        await expect(picker).toHaveAttribute("aria-expanded", "false");
+
+        // Likewise after a swipe that scrolls, for a plain click.
+        await drag(0, -100);
+        await expect
+            .poll(() => page.evaluate(() => window.scrollY))
+            .toBeGreaterThan(0);
+        await picker.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect(picker).toHaveAttribute("aria-expanded", "true");
+        await picker.evaluate((element) => (element as HTMLElement).click());
+        await expect(page.getByRole("menu")).toHaveCount(0);
+        await expect(picker).toHaveAttribute("aria-expanded", "false");
+    } finally {
+        await context.close();
+    }
+});
+
 test("completed touch taps open pickers and allow selection and dismissal", async ({
     browser,
     baseURL,

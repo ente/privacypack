@@ -198,6 +198,7 @@
                 { "id": "gopass", "name": "Gopass" },
                 { "id": "vaultwarden", "name": "Vaultwarden" },
                 { "id": "murena_workspace", "name": "Murena Passwords" }
+                { "id": "2fas_pass", "name": "2FAS Pass" }
             ]
         },
         {

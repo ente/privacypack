@@ -475,6 +475,113 @@ test("the page fits narrow screens with a larger default font", async ({
     expect(problems).toEqual([]);
 });
 
+/** How an open menu fails to fit the screen, if it does. */
+function menuFitProblems(menu: Locator, label: string) {
+    return menu.evaluate(async (element, label) => {
+        // Radix brings the menu on screen, and limits its size, after it
+        // mounts.
+        let settled = "";
+        for (let frame = 0; frame < 60; frame++) {
+            await new Promise(requestAnimationFrame);
+            const { left, right, top, bottom } =
+                element.getBoundingClientRect();
+            const position = `${left} ${right} ${top}`;
+            if (bottom > 0 && position === settled) break;
+            settled = position;
+        }
+        const problems: string[] = [];
+        const viewport = document.documentElement.clientWidth;
+        const box = element.getBoundingClientRect();
+        if (box.left < 0 || box.right > viewport + 0.5) {
+            problems.push(
+                `${label}: the menu spans ${box.left}-${box.right}px of ${viewport}px`,
+            );
+        }
+        for (const row of element.querySelectorAll(
+            '[role^="menuitem"], [data-slot="dropdown-menu-label"]',
+        )) {
+            if (row.scrollWidth > row.clientWidth) {
+                problems.push(
+                    `${label}: "${row.textContent}" overflows by ${row.scrollWidth - row.clientWidth}px`,
+                );
+            }
+        }
+        // The alternatives menu shows how many are selected, as "0/3".
+        if (label.includes("private alternatives")) {
+            const selection = element.querySelector(
+                '[data-slot="dropdown-menu-label"] > :last-child',
+            );
+            const selectionBox = selection?.getBoundingClientRect();
+            if (
+                !selectionBox ||
+                !/^\d\/3$/.test(selection!.textContent!) ||
+                selectionBox.left < Math.max(box.left, 0) ||
+                selectionBox.right > Math.min(box.right, viewport + 0.5)
+            ) {
+                problems.push(`${label}: the selection count is hidden`);
+            }
+        }
+        return problems;
+    }, label);
+}
+
+for (const fontSize of [24, 32]) {
+    for (const width of [320, 375, 414]) {
+        test(`open menus fit a ${width}px screen with a ${fontSize}px default font`, async ({
+            page,
+            browserName,
+        }) => {
+            test.skip(
+                browserName !== "chromium",
+                "The default font size is set through Chromium CDP.",
+            );
+            await page.setViewportSize({ width, height: 800 });
+            const cdp = await page.context().newCDPSession(page);
+            await cdp.send("Page.setFontSizes", {
+                fontSizes: { standard: fontSize },
+            });
+            await page.goto("/create");
+            // The keyboard-opened menus below need the page hydrated.
+            await page.waitForLoadState("networkidle");
+            await page.evaluate(() => document.fonts.ready);
+            // Only where the menus settle matters, so skip their animations.
+            await page.addStyleTag({
+                content: '[role="menu"] { animation: none !important; }',
+            });
+            const rootFontSize = () =>
+                page.evaluate(
+                    () => getComputedStyle(document.documentElement).fontSize,
+                );
+            expect(await rootFontSize()).toBe(`${fontSize}px`);
+            const pickers = page.locator(
+                'button[data-slot="dropdown-menu-trigger"]',
+            );
+            const names = await pickers.evaluateAll((buttons) =>
+                buttons.map((button) => button.getAttribute("aria-label")),
+            );
+            expect(names.length).toBeGreaterThan(0);
+            const menu = page.getByRole("menu");
+            const problems: string[] = [];
+
+            for (const [index, name] of names.entries()) {
+                await pickers.nth(index).press("Enter");
+                problems.push(
+                    ...(await menuFitProblems(
+                        menu,
+                        `${width}px@${fontSize}px ${name}`,
+                    )),
+                );
+                await page.keyboard.press("Escape");
+                await menu.waitFor({ state: "detached" });
+            }
+
+            // Chromium can drop the font size back to the default.
+            expect(await rootFontSize()).toBe(`${fontSize}px`);
+            expect(problems).toEqual([]);
+        });
+    }
+}
+
 test("the off-screen capture copy is hidden from assistive technology", async ({
     page,
 }) => {

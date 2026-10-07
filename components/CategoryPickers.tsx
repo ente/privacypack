@@ -157,7 +157,7 @@ export default function CategoryPickers({
                                             className="h-auto w-full rounded-sm"
                                         />
                                     </div>
-                                    <span className="text-xs break-words sm:text-sm">
+                                    <span className="min-w-0 text-xs break-words sm:text-sm">
                                         {app.name}
                                     </span>
                                 </DropdownMenuRadioItem>
@@ -244,8 +244,10 @@ export default function CategoryPickers({
                         className="rounded-2xl"
                     >
                         <DropdownMenuLabel className="flex items-center justify-between gap-4 text-xs text-[#6b6b6b]">
-                            <span>Private alternatives</span>
-                            <span>
+                            <span className="min-w-0 break-words">
+                                Private alternatives
+                            </span>
+                            <span className="shrink-0">
                                 {selected.length}/{MAX_PRIVATE_ALTERNATIVES}
                             </span>
                         </DropdownMenuLabel>
@@ -277,7 +279,7 @@ export default function CategoryPickers({
                                             : ""
                                     }`}
                                 >
-                                    <div className="flex w-full flex-row items-center gap-2 pl-1">
+                                    <div className="flex w-full min-w-0 flex-row items-center gap-2 pl-1">
                                         <div className="h-5 w-5 shrink-0">
                                             <Image
                                                 src={logoSrc(alternative.id)}
@@ -288,7 +290,7 @@ export default function CategoryPickers({
                                                 className="h-auto w-full rounded-sm"
                                             />
                                         </div>
-                                        <span className="text-xs break-words sm:text-sm">
+                                        <span className="min-w-0 text-xs break-words sm:text-sm">
                                             {alternative.name}
                                         </span>
                                     </div>

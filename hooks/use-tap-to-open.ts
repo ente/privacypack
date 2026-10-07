@@ -25,7 +25,8 @@ export function useTapToOpen(
 
     // A press that Radix toggled the picker for on pointer-down, so the click
     // it produces must not toggle it again. It ends with that click, or when
-    // the pointer is released elsewhere or cancelled, or at the next press.
+    // the pointer is released elsewhere or cancelled, or at the next press
+    // or bare click.
     const pressRef = useRef<{ key: string; release: () => void } | null>(null);
 
     const endPress = () => {
@@ -109,11 +110,14 @@ export function useTapToOpen(
             const nativeEvent = event.nativeEvent as MouseEvent & {
                 pointerType?: string;
             };
-            const pressed = pressRef.current?.key === key;
-            endPress();
             // A click with no press behind it (assistive technology) did not
-            // come from a touch, so any touch state left here is stale.
-            if (nativeEvent.detail === 0) clearTouchTrigger();
+            // come from a pointer. Any press or touch state left here is
+            // stale: a press released outside the page, such as in another
+            // tab, sends no pointerup to end it.
+            const bare = nativeEvent.detail === 0;
+            const pressed = !bare && pressRef.current?.key === key;
+            endPress();
+            if (bare) clearTouchTrigger();
 
             if (
                 nativeEvent.pointerType === "touch" ||

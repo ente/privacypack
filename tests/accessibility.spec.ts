@@ -1243,6 +1243,28 @@ test("presses that end without a click do not swallow the next plain click", asy
     await expect(menu).toHaveCount(1);
 });
 
+test("a press released outside the page does not swallow the next plain click", async ({
+    page,
+}) => {
+    await page.goto("/create");
+    await page.waitForLoadState("networkidle");
+    const picker = mailAlternatives(page);
+    const menu = page.locator('[role="menu"][data-state="open"]');
+    const box = (await picker.boundingBox())!;
+
+    // Radix opens on the press. Released in another tab, it sends this page
+    // no pointerup or pointercancel.
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(menu).toHaveCount(1);
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveCount(0);
+
+    await picker.evaluate((element) => (element as HTMLElement).click());
+    await expect(menu).toHaveCount(1);
+    await expect(picker).toHaveAttribute("aria-expanded", "true");
+});
+
 test("a clipped message in the mobile bar scrolls from the keyboard", async ({
     page,
 }) => {

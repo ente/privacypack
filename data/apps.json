@@ -145,7 +145,8 @@
                 { "id": "fileverse", "name": "DDocs.new" },
                 { "id": "joplin", "name": "Joplin" },
                 { "id": "fossify_notes", "name": "Fossify Notes" },
-                { "id": "murena_workspace", "name": "Murena Notes" }
+                { "id": "murena_workspace", "name": "Murena Notes" },
+                { "id": "simplenote", name: "Simplenote" }
             ]
         },
         {

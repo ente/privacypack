@@ -288,9 +288,11 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
 // Image bytes as data: URLs, by absolute URL. Public images are served with
 // a content version in the URL, so the bytes behind a URL never change.
 const inlinedImages = new Map<string, Promise<string>>();
-// Images whose bytes did not decode. The browser's HTTP cache can hold the
-// same broken response, so the next fetch must go to the network.
-const undecodableImages = new Set<string>();
+// Images whose last load failed: a wrong type, an error status, bytes that do
+// not decode, or no response at all. The browser's HTTP cache can hold the
+// bad response, so the next fetch must go to the network. Without a response
+// there is no cached copy to lose: force-cache would have used it.
+const failedImages = new Set<string>();
 
 function readAsDataUrl(blob: Blob) {
     return new Promise<string>((resolve, reject) => {
@@ -313,7 +315,7 @@ function inlineImage(url: string) {
             EXPORT_RESOURCE_TIMEOUT_MS,
         );
         dataUrl = fetch(url, {
-            cache: undecodableImages.delete(url) ? "reload" : "force-cache",
+            cache: failedImages.delete(url) ? "reload" : "force-cache",
             signal: controller.signal,
         })
             .then((response) => {
@@ -330,7 +332,10 @@ function inlineImage(url: string) {
             })
             .finally(() => window.clearTimeout(timeout));
         inlinedImages.set(url, dataUrl);
-        dataUrl.catch(() => inlinedImages.delete(url));
+        dataUrl.catch(() => {
+            inlinedImages.delete(url);
+            failedImages.add(url);
+        });
     }
     return dataUrl;
 }
@@ -390,7 +395,7 @@ function waitForImages(container: HTMLElement, signal?: AbortSignal) {
                         const url = inlinedImageUrl(image);
                         if (url) {
                             inlinedImages.delete(url);
-                            undecodableImages.add(url);
+                            failedImages.add(url);
                         }
                         finish(
                             new Error(

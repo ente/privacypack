@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
+import http from "node:http";
+import https from "node:https";
+import type { AddressInfo } from "node:net";
 import sharp from "sharp";
 
 async function selectMail(page: Page, name = "Proton Mail") {
@@ -747,6 +750,27 @@ async function pickAlternatives(page: Page, category: string, names: string[]) {
     await page.keyboard.press("Escape");
 }
 
+/** Records the cache mode of each fetch of the card's header wordmark. */
+async function recordLogoCacheModes(page: Page) {
+    await page.addInitScript(() => {
+        const state = window as typeof window & { logoCacheModes: string[] };
+        state.logoCacheModes = [];
+        const fetch = window.fetch;
+        window.fetch = (input, init) => {
+            if (String(input).includes("url-logo.png")) {
+                state.logoCacheModes.push(init?.cache ?? "default");
+            }
+            return fetch(input, init);
+        };
+    });
+    return () =>
+        page.evaluate(
+            () =>
+                (window as typeof window & { logoCacheModes: string[] })
+                    .logoCacheModes,
+        );
+}
+
 test("html2canvas never fetches an image, so none can be missing from the PNG", async ({
     page,
 }) => {
@@ -824,6 +848,7 @@ test("a stalled image fetch fails cleanly and Retry recovers", async ({
 }) => {
     // Only the capture fetches the card's header wordmark. Its first fetch
     // never answers during the test.
+    const logoCacheModes = await recordLogoCacheModes(page);
     let stalled = 0;
     let endStall!: () => void;
     const stallEnded = new Promise<void>((resolve) => (endStall = resolve));
@@ -845,6 +870,7 @@ test("a stalled image fetch fails cleanly and Retry recovers", async ({
         // The stalled request must not be reused: Retry fetches afresh.
         await page.getByRole("button", { name: "Retry export" }).click();
         await expect(page.locator("#download-navbar")).toBeEnabled();
+        expect(await logoCacheModes()).toEqual(["force-cache", "reload"]);
         expect((await cardImagesInPng(page)).unpainted).toEqual([]);
     } finally {
         endStall();
@@ -858,6 +884,9 @@ test("an image served without an image type fails the export, not the PNG", asyn
     // html2canvas skips data: URLs that are not data:image/, which would
     // leave a gap in the PNG with no error. The first fetch of the header
     // wordmark arrives as application/octet-stream.
+    // The browser may have cached the mislabelled response, so the fetch on
+    // Retry must bypass its cache.
+    const logoCacheModes = await recordLogoCacheModes(page);
     let mislabelled = 0;
     await page.route("**/url-logo.png*", async (route) => {
         if (route.request().resourceType() === "fetch" && mislabelled === 0) {
@@ -883,7 +912,71 @@ test("an image served without an image type fails the export, not the PNG", asyn
 
     await page.getByRole("button", { name: "Retry export" }).click();
     await expect(page.locator("#download-navbar")).toBeEnabled();
+    expect(await logoCacheModes()).toEqual(["force-cache", "reload"]);
     expect((await cardImagesInPng(page)).unpainted).toEqual([]);
+});
+
+test("a mislabelled image in the HTTP cache is fetched again on Retry", async ({
+    page,
+    baseURL,
+    browserName,
+}) => {
+    test.skip(
+        process.env.PLAYWRIGHT_TEST_EXPORT !== "1",
+        "next dev needs its HMR WebSocket, which the proxy does not carry.",
+    );
+    test.skip(
+        browserName !== "chromium",
+        "WebKit upgrades the plain HTTP proxy's requests to HTTPS.",
+    );
+    // Routes turn off the HTTP cache, and Chromium does not cache responses
+    // from the test server, whose certificate it does not trust. So serve the
+    // site through a plain HTTP proxy. Its first fetch of the header wordmark
+    // arrives as application/octet-stream, and Chromium caches that.
+    const upstream = new URL(baseURL!);
+    let logoFetches = 0;
+    const proxy = http.createServer((request, response) => {
+        const mislabel =
+            request.url!.startsWith("/url-logo.png") &&
+            request.headers["sec-fetch-dest"] === "empty" &&
+            ++logoFetches === 1;
+        const forward = https.request(
+            upstream,
+            {
+                path: request.url,
+                method: request.method,
+                headers: { ...request.headers, host: upstream.host },
+                rejectUnauthorized: false,
+            },
+            (reply) => {
+                const headers = { ...reply.headers };
+                if (mislabel)
+                    headers["content-type"] = "application/octet-stream";
+                response.writeHead(reply.statusCode!, headers);
+                reply.pipe(response);
+            },
+        );
+        forward.on("error", () => response.destroy());
+        request.pipe(forward);
+    });
+    await new Promise<void>((resolve) => proxy.listen(0, "127.0.0.1", resolve));
+    try {
+        const { port } = proxy.address() as AddressInfo;
+        await page.goto(`http://127.0.0.1:${port}/create`);
+        await selectMail(page);
+        await expect(
+            page.getByRole("alert").filter({ hasText: "Export failed" }),
+        ).toBeVisible();
+        expect(logoFetches).toBe(1);
+
+        await page.getByRole("button", { name: "Retry export" }).click();
+        await expect(page.locator("#download-navbar")).toBeEnabled();
+        expect(logoFetches).toBe(2);
+        expect((await cardImagesInPng(page)).unpainted).toEqual([]);
+    } finally {
+        proxy.closeAllConnections();
+        await new Promise((resolve) => proxy.close(resolve));
+    }
 });
 
 test("an image that cannot be decoded is fetched again on Retry", async ({
@@ -894,17 +987,7 @@ test("an image that cannot be decoded is fetched again on Retry", async ({
     // fetches are whole.
     // The browser may have cached the broken response, so the fetch on
     // Retry must bypass its cache.
-    await page.addInitScript(() => {
-        const state = window as typeof window & { logoCacheModes: string[] };
-        state.logoCacheModes = [];
-        const fetch = window.fetch;
-        window.fetch = (input, init) => {
-            if (String(input).includes("url-logo.png")) {
-                state.logoCacheModes.push(init?.cache ?? "default");
-            }
-            return fetch(input, init);
-        };
-    });
+    const logoCacheModes = await recordLogoCacheModes(page);
     let fetches = 0;
     await page.route("**/url-logo.png*", async (route) => {
         if (route.request().resourceType() !== "fetch") return route.continue();
@@ -929,13 +1012,7 @@ test("an image that cannot be decoded is fetched again on Retry", async ({
     await page.getByRole("button", { name: "Retry export" }).click();
     await expect(page.locator("#download-navbar")).toBeEnabled();
     expect(fetches).toBe(2);
-    expect(
-        await page.evaluate(
-            () =>
-                (window as typeof window & { logoCacheModes: string[] })
-                    .logoCacheModes,
-        ),
-    ).toEqual(["force-cache", "reload"]);
+    expect(await logoCacheModes()).toEqual(["force-cache", "reload"]);
     const images = await cardImagesInPng(page);
     expect(images.checked).toContain("PrivacyPack Logo");
     expect(images.unpainted).toEqual([]);

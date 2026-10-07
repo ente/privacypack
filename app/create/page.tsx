@@ -68,7 +68,7 @@ export default function App() {
     const shareMobileRef = useRef<HTMLButtonElement>(null);
     const exportBarRef = useRef<HTMLDivElement>(null);
     // Space open menus leave for the mobile bar, so a tap aimed at SHARE
-    // cannot land on a menu item. 0 when the bar is hidden (sm and up), and
+    // cannot land on a menu item. 0 when the bar is hidden or static, and
     // on short screens, where a menu needs every pixel to stay usable.
     const [menuBottomReserve, setMenuBottomReserve] = useState(0);
     // Short screens clip long feedback in the bar into a small scroller.
@@ -86,14 +86,19 @@ export default function App() {
         const shortQuery = window.matchMedia("(max-height: 30rem)");
         const update = () => {
             const height = bar.getBoundingClientRect().height;
-            setMenuBottomReserve(shortQuery.matches ? 0 : height);
+            // Feedback and safe-area padding can make the bar taller than
+            // the buttons alone. Leave at least half the viewport for editing.
+            // The CSS thresholds cover the first paint before measurement.
+            bar.style.position =
+                height > window.innerHeight / 2 ? "static" : "";
+            const sticky = getComputedStyle(bar).position === "sticky";
+            setMenuBottomReserve(shortQuery.matches || !sticky ? 0 : height);
             setShortScreen(shortQuery.matches);
             // Keep focused pickers scrolled clear of the bar, which grows
             // while it shows a message (globals.css covers the first paint).
             // A bar left at the end of the page covers nothing.
-            const sticky = getComputedStyle(bar).position === "sticky";
             root.style.scrollPaddingBottom =
-                height && sticky ? `${height}px` : "";
+                height && sticky ? `${height}px` : "0px";
         };
         const observer = new ResizeObserver(update);
         observer.observe(bar);
@@ -102,6 +107,7 @@ export default function App() {
         return () => {
             observer.disconnect();
             window.removeEventListener("resize", update);
+            bar.style.position = "";
             root.style.scrollPaddingBottom = "";
         };
     }, []);

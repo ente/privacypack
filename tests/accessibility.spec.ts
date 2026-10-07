@@ -351,9 +351,9 @@ for (const [viewport, withError] of [
                 .getByRole("alert");
             await expect(alert).toContainText("Export failed");
             // Retry stays reachable however the message is clipped.
-            await expect(
-                alert.getByRole("button", { name: "Retry export" }),
-            ).toBeInViewport({ ratio: 1 });
+            const retry = alert.getByRole("button", { name: "Retry export" });
+            await retry.focus();
+            await expect(retry).toBeInViewport({ ratio: 1 });
             // On short screens the clipped text can be scrolled by keyboard.
             await expect(alert.locator("span[tabindex='0']")).toHaveCount(
                 viewport.height <= 480 ? 1 : 0,
@@ -1345,6 +1345,94 @@ for (const withError of [false, true]) {
                 await pickers.nth(index).click({ trial: true, timeout: 2_000 });
             }
         }
+    });
+}
+
+for (const { font, width, height } of [
+    { font: 16, width: 320, height: 170 },
+    { font: 24, width: 400, height: 250 },
+]) {
+    test(`export feedback leaves the builder reachable and restores the sticky bar at ${width}x${height} with a ${font}px font`, async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(
+            font !== 16 && browserName !== "chromium",
+            "The default font size is set through Chromium CDP.",
+        );
+        if (font !== 16) {
+            const cdp = await page.context().newCDPSession(page);
+            await cdp.send("Page.setFontSizes", {
+                fontSizes: { standard: font },
+            });
+        }
+        const bar = page.locator("#share-mobile").locator("xpath=../..");
+        const pickers = page.locator(
+            'button[data-slot="dropdown-menu-trigger"]',
+        );
+        await page.setViewportSize({ width, height });
+        await page.route("**/app-logos/proton_mail.jpg*", (route) =>
+            route.abort(),
+        );
+        await page.goto("/create");
+        await expect(bar).toHaveCSS("position", "sticky");
+
+        // Keyboard selection works even before the tall picker has room
+        // for its pointer target. The resulting error enlarges the bar.
+        await mailAlternatives(page).focus();
+        await page.keyboard.press("ArrowDown");
+        await page
+            .getByRole("menuitemcheckbox")
+            .filter({ hasText: "Proton Mail" })
+            .focus();
+        await page.keyboard.press("Space");
+        await page.keyboard.press("Escape");
+        const alert = page
+            .locator('[data-export-feedback="mobile"]')
+            .getByRole("alert");
+        await expect(alert).toContainText("Export failed");
+        await expect(bar).toHaveCSS("position", "static");
+        await expect(page.locator("html")).toHaveCSS(
+            "scroll-padding-bottom",
+            "0px",
+        );
+
+        const retry = alert.getByRole("button", { name: "Retry export" });
+        await retry.focus();
+        await expect(retry).toBeInViewport({ ratio: 1 });
+        for (const index of [0, 5, 27, 55]) {
+            await pickers.nth(index).click({ trial: true });
+        }
+
+        // Position can change on resize without changing the bar's size.
+        await page.setViewportSize({ width, height: 600 });
+        await expect(bar).toHaveCSS("position", "sticky");
+        await page.setViewportSize({ width, height });
+        await expect(bar).toHaveCSS("position", "static");
+        await expect(page.locator("html")).toHaveCSS(
+            "scroll-padding-bottom",
+            "0px",
+        );
+
+        // Clearing the error shrinks the bar back into a sticky control.
+        await page.unroute("**/app-logos/proton_mail.jpg*");
+        await retry.click();
+        await expect(page.locator("#share-mobile")).toBeEnabled();
+        await expect(bar).toHaveCSS("position", "sticky");
+        await expect
+            .poll(async () => {
+                const height = (await bar.boundingBox())!.height;
+                return page
+                    .locator("html")
+                    .evaluate(
+                        (element, height) =>
+                            parseFloat(
+                                getComputedStyle(element).scrollPaddingBottom,
+                            ) === height,
+                        height,
+                    );
+            })
+            .toBe(true);
     });
 }
 

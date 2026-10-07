@@ -1,6 +1,21 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import fs from "node:fs";
+import path from "node:path";
 import sharp from "sharp";
+
+type AppOption = { id: string; name: string };
+
+const categories = (
+    JSON.parse(
+        fs.readFileSync(path.join(process.cwd(), "data", "apps.json"), "utf8"),
+    ) as {
+        categories: Array<{
+            name: string;
+            mainstream_apps: AppOption[];
+            private_alternatives: AppOption[];
+        }>;
+    }
+).categories;
 
 /** WCAG contrast of an element's text against its composited background. */
 function contrastOf(locator: Locator) {
@@ -568,6 +583,13 @@ test("the page fits narrow screens with a larger default font", async ({
     expect(problems).toEqual([]);
 });
 
+/** Opens and closes menus without animating them. */
+function skipMenuAnimations(page: Page) {
+    return page.addStyleTag({
+        content: '[role="menu"] { animation: none !important; }',
+    });
+}
+
 /** How an open menu fails to fit the screen, if it does. */
 function menuFitProblems(menu: Locator, label: string) {
     return menu.evaluate(async (element, label) => {
@@ -638,9 +660,7 @@ for (const fontSize of [24, 32]) {
             await page.waitForLoadState("networkidle");
             await page.evaluate(() => document.fonts.ready);
             // Only where the menus settle matters, so skip their animations.
-            await page.addStyleTag({
-                content: '[role="menu"] { animation: none !important; }',
-            });
+            await skipMenuAnimations(page);
             const rootFontSize = () =>
                 page.evaluate(
                     () => getComputedStyle(document.documentElement).fontSize,
@@ -674,6 +694,213 @@ for (const fontSize of [24, 32]) {
         });
     }
 }
+
+/** Picks a category's mainstream app, if given, and adds alternatives. */
+async function pickOptions(
+    page: Page,
+    category: string,
+    mainstream: AppOption | null,
+    alternatives: AppOption[],
+) {
+    const row = page.locator(`[data-category="${category}"]`);
+    if (mainstream) {
+        await row.locator("button").first().click();
+        await page
+            .getByRole("menuitemradio")
+            .filter({ has: page.getByText(mainstream.name, { exact: true }) })
+            .click();
+    }
+    await row.locator("button").last().click();
+    for (const alternative of alternatives) {
+        await page
+            .getByRole("menuitemcheckbox")
+            .filter({ has: page.getByText(alternative.name, { exact: true }) })
+            .click();
+    }
+    await page.keyboard.press("Escape");
+}
+
+const longestFirst = (
+    options: AppOption[],
+    length: (option: AppOption) => number,
+) => [...options].sort((a, b) => length(b) - length(a));
+const nameLength = ({ name }: AppOption) => name.length;
+const longestWord = ({ name }: AppOption) =>
+    Math.max(...name.split(" ").map((word) => word.length));
+
+/** Picker names that wrap inside a word or spill out of their picker. */
+async function pickerNameProblems(page: Page, label: string) {
+    const problems: string[] = [];
+
+    // A folded phone's cover screen, common phones (the 402px one first
+    // showed "mailbox.or" / "g"), and widths up to past the lg breakpoint.
+    for (const width of [
+        280, 320, 360, 375, 390, 402, 414, 430, 480, 640, 768, 1024, 1280,
+    ]) {
+        await page.setViewportSize({ width, height: 900 });
+        const { wrapped, issues } = await page.evaluate(() => {
+            const issues: string[] = [];
+            let wrapped = 0;
+
+            for (const name of document.querySelectorAll<HTMLElement>(
+                "[data-picker-name]",
+            )) {
+                const picker = name.closest("button")!;
+                const style = getComputedStyle(picker);
+                const box = picker.getBoundingClientRect();
+                const left = box.left + parseFloat(style.paddingLeft);
+                const right = box.right - parseFloat(style.paddingRight);
+                const text = name.textContent!;
+                const range = document.createRange();
+                const walker = document.createTreeWalker(
+                    name,
+                    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+                );
+                let offset = 0;
+                let glyphs = 0;
+                let lines = 1;
+                let previousTop: number | null = null;
+                // A wrapped line must start after a space, "/", "-" or a
+                // <wbr> break hint, never in the middle of a word.
+                let canBreak = false;
+
+                for (
+                    let node = walker.nextNode();
+                    node;
+                    node = walker.nextNode()
+                ) {
+                    if (node.nodeName === "WBR") canBreak = true;
+                    if (node.nodeType !== Node.TEXT_NODE) continue;
+                    const content = node.textContent!;
+                    for (let index = 0; index < content.length; index++) {
+                        const character = content[index];
+                        if (!/\s/.test(character)) {
+                            range.setStart(node, index);
+                            range.setEnd(node, index + 1);
+                            // WebKit also reports an empty rect at the end of
+                            // the previous line for a wrapped glyph.
+                            const rect = Array.from(
+                                range.getClientRects(),
+                            ).reduce<DOMRect | null>(
+                                (widest, candidate) =>
+                                    !widest || candidate.width > widest.width
+                                        ? candidate
+                                        : widest,
+                                null,
+                            );
+                            if (rect) {
+                                glyphs++;
+                                if (
+                                    previousTop !== null &&
+                                    rect.top > previousTop + rect.height / 2
+                                ) {
+                                    lines++;
+                                    if (!canBreak) {
+                                        issues.push(
+                                            `${text.slice(0, offset)}|${text.slice(offset)}`,
+                                        );
+                                    }
+                                }
+                                if (
+                                    rect.left < left - 0.5 ||
+                                    rect.right > right + 0.5
+                                ) {
+                                    issues.push(`${text} spills out`);
+                                }
+                                previousTop = rect.top;
+                            }
+                        }
+                        canBreak = /[\s/-]/.test(character);
+                        offset++;
+                    }
+                }
+                if (glyphs !== text.replace(/\s/g, "").length) {
+                    issues.push(`${text}: ${glyphs} glyphs measured`);
+                }
+                if (lines > 1) wrapped++;
+            }
+            return { wrapped, issues: [...new Set(issues)] };
+        });
+
+        // Long names wrap at every width checked, so the check saw lines.
+        if (wrapped === 0) {
+            problems.push(`${label} at ${width}px: no name wraps`);
+        }
+        problems.push(
+            ...issues.map((issue) => `${label} at ${width}px: ${issue}`),
+        );
+    }
+    return problems;
+}
+
+test("picker names wrap only between words with the longest names", async ({
+    page,
+}) => {
+    // About a minute in WebKit locally.
+    test.setTimeout(180_000);
+    await page.goto("/create");
+    await page.evaluate(() => document.fonts.ready);
+    // Only the names matter, and these tests open many menus.
+    await skipMenuAnimations(page);
+    const problems = await pickerNameProblems(page, "no alternatives");
+
+    for (const count of [1, 2, 3]) {
+        for (const category of categories) {
+            await pickOptions(
+                page,
+                category.name,
+                count === 1
+                    ? longestFirst(category.mainstream_apps, nameLength)[0]
+                    : null,
+                [
+                    longestFirst(category.private_alternatives, nameLength)[
+                        count - 1
+                    ],
+                ],
+            );
+        }
+        problems.push(
+            ...(await pickerNameProblems(page, `${count} alternatives`)),
+        );
+    }
+
+    expect(problems).toEqual([]);
+});
+
+test("picker names wrap only between words with the longest words", async ({
+    page,
+}) => {
+    // About half a minute in WebKit locally.
+    test.setTimeout(120_000);
+    await page.goto("/create");
+    await page.evaluate(() => document.fonts.ready);
+    // Only the names matter, and these tests open many menus.
+    await skipMenuAnimations(page);
+
+    for (const category of categories) {
+        await pickOptions(
+            page,
+            category.name,
+            longestFirst(category.mainstream_apps, longestWord)[0],
+            longestFirst(category.private_alternatives, longestWord).slice(
+                0,
+                2,
+            ),
+        );
+    }
+    // Break hints are markup, not characters, and the name read out is
+    // the picker's label.
+    await expect(mailAlternatives(page)).toHaveAccessibleName(
+        "Mail private alternatives: mailbox.org, StartMail; 2 of 3 selected",
+    );
+    expect(
+        await mailAlternatives(page)
+            .locator("[data-picker-name]")
+            .evaluate((name) => name.textContent),
+    ).toBe("mailbox.org +1");
+
+    expect(await pickerNameProblems(page, "longest words")).toEqual([]);
+});
 
 test("the off-screen capture copy is hidden from assistive technology", async ({
     page,

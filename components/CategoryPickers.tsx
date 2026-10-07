@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { useTapToOpen } from "@/hooks/use-tap-to-open";
 import { getAssetUrl } from "@/lib/assets";
+import { fitPickerName } from "@/lib/fit-name";
 import {
     MAX_PRIVATE_ALTERNATIVES,
     getPrivateAlternativeLabel,
@@ -27,6 +28,48 @@ const triggerClassName =
     "flex h-full cursor-pointer touch-pan-y flex-col items-center rounded-2xl bg-[#2B2B2B] p-4 text-[#aeaeae] transition outline-none hover:bg-[#ededed] focus-visible:outline-hidden hover:text-black focus:bg-[#ededed] focus:text-black data-[state=open]:bg-[#ededed] data-[state=open]:text-black md:rounded-3xl";
 const triggerNameClassName =
     "mt-5 max-w-18 text-center text-xs leading-tight font-medium break-words lg:max-w-24 lg:text-base picker-xl:max-w-28 picker-2xl:max-w-40";
+// The width and font size of triggerNameClassName at each breakpoint, in px
+// at the default font size.
+const triggerNameSlots = [
+    { width: 72, fontSize: 12 },
+    { width: 96, fontSize: 16 },
+    { width: 112, fontSize: 16 },
+    { width: 160, fontSize: 16 },
+];
+
+/** A picker's visible name, which wraps only between words or at a hint. */
+function TriggerName({ name }: { name: string }) {
+    const { parts, fontSizes } = fitPickerName(name, triggerNameSlots);
+    // In rem, like the slots, so the name follows the browser's font size.
+    const [size, sizeLg, sizeXl, size2xl] = fontSizes.map(
+        (fontSize) => `${fontSize / 16}rem`,
+    );
+
+    return (
+        <div data-picker-name className={triggerNameClassName}>
+            {/* A smaller size is set on this inline span, so the lines keep
+                their height and the picker keeps its size. */}
+            <span
+                className="picker-xl:text-(length:--name-size-xl) picker-2xl:text-(length:--name-size-2xl) text-(length:--name-size) lg:text-(length:--name-size-lg)"
+                style={
+                    {
+                        "--name-size": size,
+                        "--name-size-lg": sizeLg,
+                        "--name-size-xl": sizeXl,
+                        "--name-size-2xl": size2xl,
+                    } as React.CSSProperties
+                }
+            >
+                {parts.map((part, index) => (
+                    <React.Fragment key={index}>
+                        {index > 0 && <wbr />}
+                        {part}
+                    </React.Fragment>
+                ))}
+            </span>
+        </div>
+    );
+}
 
 const logoSrc = (id: string) => getAssetUrl(`/app-logos/${id}.jpg`);
 
@@ -111,9 +154,7 @@ export default function CategoryPickers({
                                     className="h-full w-full rounded-xl object-cover md:rounded-2xl"
                                 />
                             </div>
-                            <div className={triggerNameClassName}>
-                                {item.mainstream_app_name}
-                            </div>
+                            <TriggerName name={item.mainstream_app_name} />
                             <ChevronDown className="mt-1 h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>
@@ -225,9 +266,9 @@ export default function CategoryPickers({
                                     {selected.length}/{MAX_PRIVATE_ALTERNATIVES}
                                 </span>
                             </div>
-                            <div className={triggerNameClassName}>
-                                {getPrivateAlternativeLabel(selected)}
-                            </div>
+                            <TriggerName
+                                name={getPrivateAlternativeLabel(selected)}
+                            />
                             <ChevronDown className="mt-1 h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>

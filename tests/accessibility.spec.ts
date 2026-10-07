@@ -261,6 +261,63 @@ test("pickers open from a plain click and from Enter or Space", async ({
     }
 });
 
+test("menus open and close at once for reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/create");
+    // The keyboard-opened menu below needs the page hydrated.
+    await page.waitForLoadState("networkidle");
+    const picker = mailAlternatives(page);
+    const menu = page.getByRole("menu");
+
+    await picker.focus();
+    await page.keyboard.press("Enter");
+    await expect(menu).toBeVisible();
+    expect(
+        await menu.evaluate(
+            (element) => getComputedStyle(element).animationName,
+        ),
+    ).toBe("none");
+
+    // With no closing animation, the menu is gone by the next frame.
+    await page.keyboard.press("Escape");
+    expect(
+        await page.evaluate(
+            () =>
+                new Promise((resolve) =>
+                    requestAnimationFrame(() =>
+                        resolve(
+                            document.querySelectorAll('[role="menu"]').length,
+                        ),
+                    ),
+                ),
+        ),
+    ).toBe(0);
+    await expect(picker).toBeFocused();
+});
+
+test("menus still animate with no reduced motion preference", async ({
+    page,
+}) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/create");
+    // The keyboard-opened menu below needs the page hydrated.
+    await page.waitForLoadState("networkidle");
+    const picker = mailAlternatives(page);
+    const menu = page.getByRole("menu");
+
+    await picker.focus();
+    await page.keyboard.press("Enter");
+    await expect(menu).toBeVisible();
+    expect(
+        await menu.evaluate(
+            (element) => getComputedStyle(element).animationName,
+        ),
+    ).not.toBe("none");
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveCount(0);
+    await expect(picker).toBeFocused();
+});
+
 for (const [viewport, withError] of [
     [{ width: 375, height: 667 }, false],
     // A landscape phone, and 400% zoom of a 1280x900 window.

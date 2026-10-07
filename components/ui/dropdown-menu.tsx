@@ -48,6 +48,11 @@ function DropdownMenuContent({
                     // Portalled to <body>, outside the page font's wrapper
                     // (app/layout.tsx).
                     "font-(family-name:--font-jetbrains-mono)",
+                    // No open or close animation for reduced motion, so a
+                    // closing menu unmounts at once. data-[state] matches the
+                    // specificity of the data-[state=...] animations below,
+                    // which Tailwind emits before it.
+                    "motion-reduce:data-[state]:animate-none",
                     "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) max-w-(--radix-dropdown-menu-content-available-width) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto border p-1 shadow-md",
                     className,
                 )}

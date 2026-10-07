@@ -34,9 +34,45 @@ function DropdownMenuTrigger({
     );
 }
 
+// Not Radix's focus guards, which only redirect focus.
+const TABBABLE =
+    "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([data-radix-focus-guard])";
+
+/**
+ * Radix keeps Tab inside a menu. As in the ARIA menu button pattern, leave
+ * it instead, as if the menu sat just after its trigger: Shift+Tab goes to
+ * the trigger and Tab to the control after it. Focus moving out closes a
+ * non-modal menu, and Radix then leaves focus where it is.
+ */
+function tabOutOfMenu(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+    }
+    const menu = event.currentTarget;
+    const trigger = document.getElementById(
+        menu.getAttribute("aria-labelledby") ?? "",
+    );
+    if (!trigger) return;
+    event.preventDefault();
+    const next = event.shiftKey
+        ? undefined
+        : Array.from(document.querySelectorAll<HTMLElement>(TABBABLE)).find(
+              (element) =>
+                  trigger.compareDocumentPosition(element) &
+                      Node.DOCUMENT_POSITION_FOLLOWING &&
+                  !trigger.contains(element) &&
+                  !menu.contains(element) &&
+                  element.tabIndex >= 0 &&
+                  element.getClientRects().length > 0,
+          );
+    // With nothing after the trigger, Tab also closes the menu on it.
+    (next ?? trigger).focus();
+}
+
 function DropdownMenuContent({
     className,
     sideOffset = 4,
+    onKeyDown,
     ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
     return (
@@ -44,6 +80,10 @@ function DropdownMenuContent({
             <DropdownMenuPrimitive.Content
                 data-slot="dropdown-menu-content"
                 sideOffset={sideOffset}
+                onKeyDown={(event) => {
+                    onKeyDown?.(event);
+                    if (!event.defaultPrevented) tabOutOfMenu(event);
+                }}
                 className={cn(
                     // Portalled to <body>, outside the page font's wrapper
                     // (app/layout.tsx).

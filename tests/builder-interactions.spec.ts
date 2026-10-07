@@ -321,6 +321,56 @@ test("keyboard users can change mainstream apps and toggle alternatives", async 
     await expect(page.getByRole("menu")).toHaveCount(0);
 });
 
+test("Tab and Shift+Tab leave either picker's menu and close it", async ({
+    page,
+}) => {
+    await page.goto("/create");
+    const pickers = page.locator('button[data-slot="dropdown-menu-trigger"]');
+    const openMenu = page.locator('[role="menu"][data-state="open"]');
+    const share = page.locator("#share-navbar");
+
+    // Mail's two pickers come first. The menu sits as if just after its
+    // trigger: Shift+Tab returns to the trigger, Tab goes past it.
+    for (const index of [0, 1]) {
+        for (const [key, target] of [
+            ["Tab", index + 1],
+            ["Shift+Tab", index],
+        ] as const) {
+            await pickers.nth(index).focus();
+            await page.keyboard.press("ArrowDown");
+            await expect(openMenu).toHaveCount(1);
+            await page.keyboard.press(key);
+            await expect(openMenu).toHaveCount(0);
+            await expect(pickers.nth(target), key).toBeFocused();
+            // The menu's closing animation must not take focus back.
+            await page.waitForTimeout(300);
+            await expect(pickers.nth(target), key).toBeFocused();
+        }
+    }
+
+    // A pick waits for its menu to close before the image is prepared.
+    await pickers.nth(1).focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Space");
+    await expect(
+        openMenu.getByRole("menuitemcheckbox").first(),
+    ).toHaveAttribute("aria-checked", "true");
+    await expect(share).toBeDisabled();
+    await page.keyboard.press("Tab");
+    await expect(openMenu).toHaveCount(0);
+    await expect(pickers.nth(2)).toBeFocused();
+    await expect(share).toBeEnabled();
+
+    // With nothing after the last picker, Tab closes its menu on it.
+    const last = pickers.last();
+    await last.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(openMenu).toHaveCount(1);
+    await page.keyboard.press("Tab");
+    await expect(openMenu).toHaveCount(0);
+    await expect(last).toBeFocused();
+});
+
 test("mouse users can select apps and dismiss either picker", async ({
     page,
 }) => {

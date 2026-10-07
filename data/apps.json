@@ -509,7 +509,8 @@
                 { "id": "nixos", "name": "NixOS" },
                 { "id": "tiger_os", "name": "Tiger OS" },
                 { "id": "opensuse", "name": "openSUSE" },
-                { "id": "zorin_os", "name": "Zorin OS" }
+                { "id": "zorin_os", "name": "Zorin OS" },
+                { "id": "cachy_os", "name": "Cachy OS" }
             ]
         },
         {

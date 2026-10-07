@@ -263,12 +263,18 @@ export default function App() {
     return (
         <>
             <div className="flex min-h-dvh w-full flex-col p-4 pb-0 sm:pb-4">
-                <div className="flex w-full flex-row items-center justify-between md:px-4 md:pt-4">
+                {/* Below sm a larger default font can leave no room for the
+                    wordmark and link side by side. The link then wraps under
+                    the wordmark, which breaks before "Pack". From sm, where
+                    the export buttons join them, neither wraps. */}
+                <div className="flex w-full flex-row items-center justify-between gap-y-2 max-sm:flex-wrap md:px-4 md:pt-4">
                     <Link
                         href="/"
-                        className="green-text pr-1 text-2xl font-bold"
+                        className="green-text pr-1 text-2xl font-bold sm:shrink-0"
                     >
-                        PrivacyPack
+                        Privacy
+                        <wbr />
+                        Pack
                     </Link>
                     <div
                         onPointerDownCapture={closePicker}
@@ -352,7 +358,9 @@ export default function App() {
                         textClassName="[@media(max-height:30rem)]:block [@media(max-height:30rem)]:max-h-10 [@media(max-height:30rem)]:overflow-y-auto"
                         scrollableText={shortScreen}
                     />
-                    <div className="flex flex-col gap-3 [@media(max-height:30rem)]:flex-row">
+                    {/* Side by side on short screens wide enough for them,
+                        as in globals.css. */}
+                    <div className="flex flex-col gap-3 [@media(max-height:30rem)_and_(min-width:16rem)]:flex-row">
                         <ExportButton
                             ref={shareMobileRef}
                             action="share"

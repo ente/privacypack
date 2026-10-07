@@ -345,6 +345,63 @@ test("the header does not overflow while an image is preparing", async ({
     }
 });
 
+/** How the pickers fail to fit the page at its current width, if they do. */
+async function pickerFitProblems(page: Page, label: string) {
+    const { overflow, squeezedArrows, spilledPickers, offscreenPickers } =
+        await page.evaluate(() => {
+            const arrows = [
+                ...document.querySelectorAll("[data-picker-arrow]"),
+            ];
+            return {
+                overflow:
+                    document.documentElement.scrollWidth - window.innerWidth,
+                // The arrow is 24px wide unless it is squeezed.
+                squeezedArrows: arrows.filter(
+                    (arrow) => arrow.getBoundingClientRect().width < 24,
+                ).length,
+                spilledPickers: arrows.flatMap((arrow) => {
+                    const card = arrow.parentElement!;
+                    const cardBox = card.getBoundingClientRect();
+                    return [...card.querySelectorAll("button")].filter(
+                        (picker) => {
+                            const box = picker.getBoundingClientRect();
+                            return (
+                                box.left < cardBox.left ||
+                                box.right > cardBox.right
+                            );
+                        },
+                    );
+                }).length,
+                offscreenPickers: arrows.flatMap((arrow) =>
+                    [...arrow.parentElement!.querySelectorAll("button")].filter(
+                        (picker) => {
+                            const box = picker.getBoundingClientRect();
+                            return (
+                                box.left < 0 || box.right > window.innerWidth
+                            );
+                        },
+                    ),
+                ).length,
+            };
+        });
+    const problems: string[] = [];
+    if (overflow > 0) {
+        problems.push(`${label}: the page overflows by ${overflow}px`);
+    }
+    if (squeezedArrows > 0) {
+        problems.push(`${label}: ${squeezedArrows} squeezed arrows`);
+    }
+    if (spilledPickers > 0) {
+        problems.push(
+            `${label}: ${spilledPickers} pickers spill out of their cards`,
+        );
+    }
+    if (offscreenPickers > 0) {
+        problems.push(`${label}: ${offscreenPickers} pickers are off screen`);
+    }
+    return problems;
+}
+
 test("the pickers fit the page and keep their arrows at every width", async ({
     page,
 }) => {
@@ -357,48 +414,60 @@ test("the pickers fit the page and keep their arrows at every width", async ({
 
     // Common screens, and either side of each width where the grid gains a
     // column or larger logos.
+    // 280px, a folded phone's cover screen, is narrow enough to stack the
+    // pickers even at the default font.
     for (const width of [
-        320, 375, 639, 640, 767, 768, 1023, 1024, 1279, 1280, 1366, 1423, 1424,
-        1440, 1536, 1550, 1600, 1680, 1871, 1872, 1920, 2560,
+        280, 320, 375, 639, 640, 767, 768, 1023, 1024, 1279, 1280, 1366, 1423,
+        1424, 1440, 1536, 1550, 1600, 1680, 1871, 1872, 1920, 2560,
     ]) {
         await page.setViewportSize({ width, height: 900 });
-        const { overflow, squeezedArrows, spilledPickers } =
-            await page.evaluate(() => {
-                const arrows = [
-                    ...document.querySelectorAll("[data-picker-arrow]"),
-                ];
-                return {
-                    overflow:
-                        document.documentElement.scrollWidth -
-                        window.innerWidth,
-                    // The arrow is 24px wide unless it is squeezed.
-                    squeezedArrows: arrows.filter(
-                        (arrow) => arrow.getBoundingClientRect().width < 24,
-                    ).length,
-                    spilledPickers: arrows.flatMap((arrow) => {
-                        const card = arrow.parentElement!;
-                        const cardBox = card.getBoundingClientRect();
-                        return [...card.querySelectorAll("button")].filter(
-                            (picker) => {
-                                const box = picker.getBoundingClientRect();
-                                return (
-                                    box.left < cardBox.left ||
-                                    box.right > cardBox.right
-                                );
-                            },
-                        );
-                    }).length,
-                };
-            });
-        if (overflow > 0) {
-            problems.push(`${width}px: the page overflows by ${overflow}px`);
-        }
-        if (squeezedArrows > 0) {
-            problems.push(`${width}px: ${squeezedArrows} squeezed arrows`);
-        }
-        if (spilledPickers > 0) {
+        problems.push(...(await pickerFitProblems(page, `${width}px`)));
+    }
+
+    expect(problems).toEqual([]);
+});
+
+test("the page fits narrow screens with a larger default font", async ({
+    page,
+    browserName,
+}) => {
+    test.skip(
+        browserName !== "chromium",
+        "The default font size is set through Chromium CDP.",
+    );
+    // Breakpoints in rem follow the browser's default font size, not the
+    // page's, so this sets the browser preference.
+    const cdp = await page.context().newCDPSession(page);
+    const problems: string[] = [];
+
+    for (const fontSize of [20, 24, 32]) {
+        await cdp.send("Page.setFontSizes", {
+            fontSizes: { standard: fontSize },
+        });
+        await page.goto("/create");
+        await page.evaluate(() => document.fonts.ready);
+        expect(
+            await page.evaluate(
+                () => getComputedStyle(document.documentElement).fontSize,
+            ),
+        ).toBe(`${fontSize}px`);
+
+        for (const width of [320, 360, 375, 414, 480, 640, 768]) {
+            // A phone's height. With a 32px font that is under 30rem, a
+            // short screen, where the export bar's buttons go side by side
+            // if they fit.
+            await page.setViewportSize({ width, height: 800 });
+            // Chromium can drop the font size back to the default.
+            const rootFontSize = await page.evaluate(
+                () => getComputedStyle(document.documentElement).fontSize,
+            );
+            if (rootFontSize !== `${fontSize}px`) {
+                problems.push(
+                    `${width}px@${fontSize}px: the font size is ${rootFontSize}`,
+                );
+            }
             problems.push(
-                `${width}px: ${spilledPickers} pickers spill out of their cards`,
+                ...(await pickerFitProblems(page, `${width}px@${fontSize}px`)),
             );
         }
     }

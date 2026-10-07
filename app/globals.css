@@ -15,8 +15,9 @@ body {
 }
 
 /* On short screens (landscape phones, 400% zoom) its buttons sit side by
-   side, so the bar covers less of the page. */
-@media (max-width: 39.999rem) and (max-height: 30rem) {
+   side, so the bar covers less of the page. That takes about 14.5rem, more
+   than a narrow screen has with a larger default font. */
+@media (max-width: 39.999rem) and (max-height: 30rem) and (min-width: 16rem) {
     html {
         scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
     }
@@ -32,6 +33,13 @@ body {
 
 @theme inline {
     --breakpoint-xs: 24rem;
+    /* Narrower than this the create page stacks each pair of pickers. Side
+       by side they need two pickers (6.5rem each), the card's padding
+       (1.5rem), the page's padding (2rem) and a 24px arrow, which is 1.5rem
+       at the default font size and less at larger ones. Like every rem
+       breakpoint, it follows the browser's default font size, so a larger
+       font stacks the pickers on wider screens. */
+    --breakpoint-picker-row: 18rem;
     /* The create page's pickers go to three columns, then to their largest
        logos, only once those fit: three cards (25rem, then 31rem) and two
        gaps (5rem, then 10rem), plus the page's 2rem padding and 2rem for a

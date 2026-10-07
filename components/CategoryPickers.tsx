@@ -84,7 +84,9 @@ export default function CategoryPickers({
     return (
         <div data-category={item.category} className="flex flex-col gap-2">
             <h2 className="mb-1 text-[#aeaeae]">{item.category}</h2>
-            <div className="xs:p-8 flex h-full w-full flex-row items-center justify-between rounded-3xl bg-[#fff]/2 p-3 sm:w-auto sm:justify-normal sm:gap-3 md:rounded-4xl">
+            {/* Stacked, with the arrow pointing down, where a larger
+                default font leaves no room for the pickers side by side. */}
+            <div className="xs:p-8 picker-row:flex-row flex h-full w-full flex-col items-center justify-between gap-y-2 rounded-3xl bg-[#fff]/2 p-3 sm:w-auto sm:justify-normal sm:gap-3 md:rounded-4xl">
                 <DropdownMenu
                     modal={false}
                     open={openKey === mainKey}
@@ -166,7 +168,7 @@ export default function CategoryPickers({
 
                 <ArrowRight
                     data-picker-arrow
-                    className="shrink-0 text-[#aeaeae] transition"
+                    className="picker-row:rotate-0 shrink-0 rotate-90 text-[#aeaeae] transition"
                     aria-hidden="true"
                 />
 

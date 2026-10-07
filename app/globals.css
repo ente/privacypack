@@ -23,6 +23,16 @@ body {
     }
 }
 
+/* Where the bar's buttons would take half the screen, side by side (5rem)
+   or stacked (8.75rem), the bar stays at the end of the page and covers
+   nothing. A larger default font on a short screen does this. */
+@media (max-width: 39.999rem) and (max-height: 10rem),
+    (max-width: 15.999rem) and (max-height: 17.5rem) {
+    html {
+        scroll-padding-bottom: 0;
+    }
+}
+
 .green-text {
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMwvsIAAAJFAQj8cHnTAAAAAElFTkSuQmCC")
         repeat;

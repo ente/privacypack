@@ -1265,6 +1265,89 @@ test("a press released outside the page does not swallow the next plain click", 
     await expect(picker).toHaveAttribute("aria-expanded", "true");
 });
 
+for (const withError of [false, true]) {
+    test(`the builder stays reachable with a larger default font on a short screen${withError ? " with an export error" : ""}`, async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(
+            browserName !== "chromium",
+            "The default font size is set through Chromium CDP.",
+        );
+        // 400% zoom of a 1280x900 window. At these fonts the bar's stacked
+        // buttons would cover most or all of it.
+        await page.setViewportSize({ width: 320, height: 225 });
+        if (withError) {
+            await page.route("**/app-logos/proton_mail.jpg*", (route) =>
+                route.abort(),
+            );
+        }
+        const cdp = await page.context().newCDPSession(page);
+        const bar = page.locator("#share-mobile").locator("xpath=../..");
+        const pickers = page.locator(
+            'button[data-slot="dropdown-menu-trigger"]',
+        );
+
+        for (const fontSize of [24, 32]) {
+            await cdp.send("Page.setFontSizes", {
+                fontSizes: { standard: fontSize },
+            });
+            await page.goto("/create");
+            expect(
+                await page.evaluate(
+                    () => getComputedStyle(document.documentElement).fontSize,
+                ),
+            ).toBe(`${fontSize}px`);
+            await expect(bar).toHaveCSS("position", "static");
+
+            // A plain click, which fails if the bar is in the way.
+            await mailAlternatives(page).click();
+            // The picker is taller than the screen, so its menu opens below
+            // the screen. Scrolling brings the menu up, then scrolls it.
+            const proton = page
+                .getByRole("menuitemcheckbox")
+                .filter({ hasText: "Proton Mail" });
+            await expect
+                .poll(
+                    async () => {
+                        const inView = await proton.evaluate((element) => {
+                            const { top, bottom } =
+                                element.getBoundingClientRect();
+                            return top >= 0 && bottom <= window.innerHeight;
+                        });
+                        if (!inView) await page.mouse.wheel(0, 60);
+                        return inView;
+                    },
+                    { intervals: [150] },
+                )
+                .toBe(true);
+            const box = (await proton.boundingBox())!;
+            await page.mouse.click(
+                box.x + box.width / 2,
+                box.y + box.height / 2,
+            );
+            await expect(proton).toHaveAttribute("aria-checked", "true");
+            await page.keyboard.press("Escape");
+            const feedback = page.locator('[data-export-feedback="mobile"]');
+            if (withError) {
+                const alert = feedback.getByRole("alert");
+                await expect(alert).toContainText("Export failed");
+                await alert
+                    .getByRole("button", { name: "Retry export" })
+                    .click({ trial: true });
+            } else {
+                await page.locator("#share-mobile").click({ trial: true });
+            }
+
+            // Every picker can be clicked once scrolled to.
+            const count = await pickers.count();
+            for (let index = 0; index < count; index++) {
+                await pickers.nth(index).click({ trial: true, timeout: 2_000 });
+            }
+        }
+    });
+}
+
 test("a clipped message in the mobile bar scrolls from the keyboard", async ({
     page,
 }) => {

@@ -84,17 +84,24 @@ export default function App() {
         if (!bar) return;
         const root = document.documentElement;
         const shortQuery = window.matchMedia("(max-height: 30rem)");
-        const observer = new ResizeObserver(() => {
+        const update = () => {
             const height = bar.getBoundingClientRect().height;
             setMenuBottomReserve(shortQuery.matches ? 0 : height);
             setShortScreen(shortQuery.matches);
             // Keep focused pickers scrolled clear of the bar, which grows
             // while it shows a message (globals.css covers the first paint).
-            root.style.scrollPaddingBottom = height ? `${height}px` : "";
-        });
+            // A bar left at the end of the page covers nothing.
+            const sticky = getComputedStyle(bar).position === "sticky";
+            root.style.scrollPaddingBottom =
+                height && sticky ? `${height}px` : "";
+        };
+        const observer = new ResizeObserver(update);
         observer.observe(bar);
+        // The bar can stop sticking without changing size.
+        window.addEventListener("resize", update);
         return () => {
             observer.disconnect();
+            window.removeEventListener("resize", update);
             root.style.scrollPaddingBottom = "";
         };
     }, []);
@@ -343,11 +350,14 @@ export default function App() {
                 </main>
 
                 {/* Sticky in the page flow, so it never covers the last row
-                    and grows with its feedback. */}
+                    and grows with its feedback. Where its buttons would take
+                    half the screen (a larger default font on a short screen),
+                    it stays at the end of the page instead, as in
+                    globals.css. */}
                 <div
                     ref={exportBarRef}
                     onPointerDownCapture={closePicker}
-                    className="sticky bottom-0 z-40 -mx-4 mt-auto border-t border-white/10 bg-[#161616] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:hidden"
+                    className="sticky bottom-0 z-40 -mx-4 mt-auto border-t border-white/10 bg-[#161616] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:hidden [@media(max-height:10rem)]:static [@media(max-height:17.5rem)_and_(max-width:15.999rem)]:static"
                 >
                     <ExportFeedback
                         {...feedback}

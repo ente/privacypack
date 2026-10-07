@@ -429,6 +429,8 @@ function renderPrivacyPackInVirtualDOM() {
 
     const virtualDiv = document.createElement("div");
 
+    // The PNG must not change with the viewer's forced-colors setting. The
+    // property is inherited, here and in html2canvas's clone of this div.
     virtualDiv.style.cssText = `
     position: fixed;
     left: -10000px;
@@ -438,6 +440,7 @@ function renderPrivacyPackInVirtualDOM() {
     pointer-events: none;
     background-color: #121212;
     font-family: ${PRIVACY_PACK_FONT_FAMILY};
+    forced-color-adjust: none;
     overflow: hidden;
   `;
 

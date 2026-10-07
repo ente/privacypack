@@ -1,4 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import fs from "node:fs";
+import sharp from "sharp";
 
 /** WCAG contrast of an element's text against its composited background. */
 function contrastOf(locator: Locator) {
@@ -119,6 +121,102 @@ test("forced-colors mode outlines only the focused picker or menu item", async (
     await expect(options.nth(0)).toBeFocused();
     expect(await outline(options.nth(0))).not.toBe("none");
     expect(await outline(options.nth(1))).toBe("none");
+});
+
+test("forced-colors mode does not change the exported image", async ({
+    page,
+    browserName,
+}) => {
+    test.skip(
+        browserName !== "chromium",
+        "Forced colors emulation is Chromium only.",
+    );
+    // The image is prepared once per pack, so each export loads the page.
+    const exportBrave = async () => {
+        await page.goto("/create");
+        await page
+            .getByRole("button", { name: /^Browser private alternatives:/ })
+            .click();
+        await page
+            .getByRole("menuitemcheckbox", { name: "Brave", exact: true })
+            .click();
+        await page.keyboard.press("Escape");
+        const [download] = await Promise.all([
+            page.waitForEvent("download"),
+            page.locator("#download-navbar").click(),
+        ]);
+        return sharp(fs.readFileSync((await download.path())!))
+            .removeAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+    };
+    const pageBackground = () =>
+        page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const expected = await exportBrave();
+    const expectedPageBackground = await pageBackground();
+    await page.emulateMedia({ forcedColors: "active" });
+    const { data, info } = await exportBrave();
+    // The page itself still follows forced colors.
+    expect(await pageBackground()).not.toBe(expectedPageBackground);
+
+    const arrow = await page.evaluate(() => {
+        const card = document
+            .getElementById("privacy-pack-result-to-capture")!
+            .cloneNode(true) as HTMLElement;
+        card.style.cssText +=
+            ";display:block;position:fixed;left:-10000px;top:0";
+        document.body.appendChild(card);
+        try {
+            const origin = card.getBoundingClientRect();
+            const rect = card.querySelector("svg")!.getBoundingClientRect();
+            return {
+                left: rect.left - origin.left,
+                top: rect.top - origin.top,
+                width: rect.width,
+                height: rect.height,
+            };
+        } finally {
+            card.remove();
+        }
+    });
+    /** The lowest and highest channel values in a box of the 2x PNG. */
+    const channelRange = (box: typeof arrow) => {
+        let min = 255;
+        let max = 0;
+        for (
+            let y = Math.round(box.top * 2);
+            y < Math.round((box.top + box.height) * 2);
+            y++
+        ) {
+            const row = y * info.width * info.channels;
+            for (
+                let index = row + Math.round(box.left * 2) * info.channels;
+                index <
+                row + Math.round((box.left + box.width) * 2) * info.channels;
+                index++
+            ) {
+                min = Math.min(min, data[index]);
+                max = Math.max(max, data[index]);
+            }
+        }
+        return { min, max };
+    };
+    // The background stays #121212 and the arrow #e6e6e6 on it, rather than
+    // a forced white background behind the unadjusted light arrow.
+    const background = channelRange({ left: 0, top: 0, width: 20, height: 20 });
+    expect(background.min).toBeGreaterThanOrEqual(0x12 - 2);
+    expect(background.max).toBeLessThanOrEqual(0x12 + 2);
+    const arrowRange = channelRange(arrow);
+    expect(Math.abs(arrowRange.min - 0x12)).toBeLessThanOrEqual(2);
+    expect(Math.abs(arrowRange.max - 0xe6)).toBeLessThanOrEqual(2);
+
+    // Nothing else in the image changes either.
+    expect(info).toEqual(expected.info);
+    let differing = 0;
+    for (let index = 0; index < data.length; index++) {
+        if (Math.abs(data[index] - expected.data[index]) > 8) differing++;
+    }
+    expect(differing).toBe(0);
 });
 
 test("pickers open from a plain click and from Enter or Space", async ({

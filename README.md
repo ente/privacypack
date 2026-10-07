@@ -68,6 +68,14 @@ The card is drawn in the browser from the hidden `components/PrivacyPackResult.t
 
 The card uses the bundled JetBrains Mono font. If it cannot be loaded, for example because a content blocker or iOS Lockdown Mode blocks web fonts, the image uses a system monospace font and the page says so. Each image is fetched once and embedded in the capture, so html2canvas never fetches images itself, and an image that cannot load fails the export rather than leaving a gap.
 
+### Dependency versions
+
+Three packages deliberately stay behind `npm outdated`:
+
+- `typescript` stays on 6.x. TypeScript 7 has no JavaScript API yet, which `typescript-eslint` (used by `eslint-config-next`) needs.
+- `@types/node` follows the Node major in `.node-version` (22), so code cannot typecheck against Node APIs the runtime does not have.
+- `html2canvas-pro` stays on 1.x. In 2.x the cloned page's stylesheet can load after rendering starts, which leaves the card unstyled in WebKit, and a slow web font holds the capture until it times out.
+
 ### Dependency audit
 
 `npm audit` reports a high-severity advisory for `braces` (GHSA-vfj7-8cjw-p6xm). It reaches the project only through `eslint-config-next`'s lint-time file globbing, is not part of the exported site, and has no patched release yet. Do not run `npm audit fix --force`: it would downgrade `eslint-config-next` to a different Next.js major.

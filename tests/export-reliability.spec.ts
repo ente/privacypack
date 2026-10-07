@@ -229,8 +229,7 @@ test("capture waits for newly injected clone fonts before encoding the PNG", asy
         };
         const patch = (frame: HTMLIFrameElement) => {
             const view = frame.contentWindow as
-                | (Window & typeof globalThis)
-                | null;
+                (Window & typeof globalThis) | null;
             if (!view) return;
             const proto = Object.getPrototypeOf(
                 view.document.fonts,
@@ -300,8 +299,7 @@ test("failed clones are cleaned up and a stalled clone cannot block a new select
                     )
                         continue;
                     const view = node.contentWindow as
-                        | (Window & typeof globalThis)
-                        | null;
+                        (Window & typeof globalThis) | null;
                     if (!view) continue;
                     const attempt = ++state.cloneAttempts;
                     if (attempt === 1) {

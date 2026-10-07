@@ -479,7 +479,8 @@
                 { "id": "adguard", "name": "AdGuard DNS" },
                 { "id": "quad9", "name": "Quad9 DNS" },
                 { "id": "mullvad_dns", "name": "Mullvad DNS" },
-                { "id": "opennic", "name": "OpenNIC" }
+                { "id": "opennic", "name": "OpenNIC" },
+                { "id": "dns4eu", "name": "DNS4EU" }
             ]
         },
         {
@@ -491,6 +492,7 @@
             ],
             "private_alternatives": [
                 { "id": "arch_linux", "name": "Arch Linux" },
+                { "id": "cachyos", "name": "CachyOS" },
                 { "id": "macos", "name": "macOS" },
                 { "id": "linux_mint", "name": "Linux Mint" },
                 { "id": "qubes_os", "name": "Qubes OS" },
@@ -568,7 +570,8 @@
             "name": "Domain Hosting",
             "order": 28,
             "mainstream_apps": [
-                { "id": "godaddy", "name": "GoDaddy" }
+                { "id": "godaddy", "name": "GoDaddy" },
+                { "id": "namecheap", "name": "Namecheap" }
             ],
             "private_alternatives": [
                 { "id": "cloudflare", "name": "Cloudflare Registrar" },

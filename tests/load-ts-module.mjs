@@ -14,6 +14,7 @@ export async function loadTsModule(filePath, modules = {}) {
             module: ts.ModuleKind.CommonJS,
             target: ts.ScriptTarget.ES2020,
             esModuleInterop: true,
+            jsx: ts.JsxEmit.React,
         },
         fileName: path.basename(filePath),
     });

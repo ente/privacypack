@@ -237,7 +237,9 @@ test("export controls stay disabled while a share is pending", async ({
     await page.locator("#share-navbar").click();
 
     await expect(page.locator("#share-navbar")).toBeDisabled();
-    await expect(page.locator("#share-navbar")).toContainText("SHARING...");
+    await expect(page.locator("#share-navbar")).toHaveAccessibleName(
+        "SHARE (sharing)",
+    );
     await expect(page.locator("#download-navbar")).toBeDisabled();
     await page.locator("#share-navbar").click({ force: true });
     await page.locator("#download-navbar").click({ force: true });
@@ -328,7 +330,7 @@ test("keyboard focus stays on Share while and after it runs", async ({
     const share = page.locator("#share-navbar");
     await share.focus();
     await page.keyboard.press("Enter");
-    await expect(share).toContainText("SHARING...");
+    await expect(share).toHaveAccessibleName("SHARE (sharing)");
     await expect(share).toBeFocused();
 
     await page.evaluate(() =>

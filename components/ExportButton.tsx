@@ -7,15 +7,12 @@ const ACTIONS: Record<
     {
         Icon: typeof Share2;
         label: string;
-        /** Only sharing waits on the browser; downloads start synchronously. */
-        busyLabel?: string;
         title: string;
     }
 > = {
     share: {
         Icon: Share2,
         label: "SHARE",
-        busyLabel: "SHARING...",
         title: "Share PrivacyPack",
     },
     download: {
@@ -52,28 +49,19 @@ const PLACEMENTS = {
                 <span className="hidden md:inline">PREPARING...</span>
             </>
         ),
-        busyLabel: undefined,
     },
     mobile: {
         className: "flex h-12 w-full",
         labelClassName: "text-lg",
         iconSize: 16,
         hover: false,
-        // Side by side on a short screen, two PREPARING... labels or a
-        // SHARING... label can be wider than the screen, and with a larger
-        // font one can be wider than its button. So the buttons keep their
-        // own labels and the spinner shows progress; the hidden text keeps
-        // it in their names. Only Share is ever busy.
+        // Side by side on a short screen, two PREPARING... labels can be
+        // wider than the screen. Keep their own labels, with progress in
+        // the spinner and accessible names.
         preparingLabel: (label: string) => (
             <>
                 {label}
                 <span className="sr-only"> (preparing)</span>
-            </>
-        ),
-        busyLabel: (label: string) => (
-            <>
-                {label}
-                <span className="sr-only"> (sharing)</span>
             </>
         ),
     },
@@ -111,7 +99,7 @@ export default function ExportButton({
     preparing,
     canExport,
 }: ExportButtonProps) {
-    const { Icon, label, busyLabel, title } = ACTIONS[action];
+    const { Icon, label, title } = ACTIONS[action];
     const toneStyle = TONES[tone];
     const placementStyle = PLACEMENTS[placement];
     const Indicator = busy || preparing ? Loader2 : Icon;
@@ -145,13 +133,18 @@ export default function ExportButton({
                 aria-hidden="true"
             />
             <span className={placementStyle.labelClassName}>
-                {preparing
-                    ? placementStyle.preparingLabel(label)
-                    : busy
-                      ? (placementStyle.busyLabel?.(label) ??
-                        busyLabel ??
-                        label)
-                      : label}
+                {preparing ? (
+                    placementStyle.preparingLabel(label)
+                ) : busy ? (
+                    <>
+                        {label}
+                        {/* Keep the label's width in both the header and
+                            mobile bar while exposing the busy state. */}
+                        <span className="sr-only"> (sharing)</span>
+                    </>
+                ) : (
+                    label
+                )}
             </span>
         </button>
     );

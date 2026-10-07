@@ -511,8 +511,7 @@ test("the mobile export bar fits a larger default font while an image is prepari
     }
 });
 
-/** Shares from the mobile bar and checks it while and after sharing. */
-async function checkMobileBarWhileSharing(page: Page, fontSize = 16) {
+async function holdSharing(page: Page) {
     // Hold the share sheet open until the test resolves it.
     await page.addInitScript(() => {
         const held = window as unknown as { resolveShare: () => void };
@@ -528,6 +527,11 @@ async function checkMobileBarWhileSharing(page: Page, fontSize = 16) {
                 }),
         });
     });
+}
+
+/** Shares from the mobile bar and checks it while and after sharing. */
+async function checkMobileBarWhileSharing(page: Page, fontSize = 16) {
+    await holdSharing(page);
     await page.goto("/create");
     await mailAlternatives(page).click();
     await page
@@ -587,6 +591,93 @@ test("the mobile export bar fits a larger default font while sharing", async ({
     // 600px is 30rem and 320px is 16rem, so the buttons sit side by side.
     await page.setViewportSize({ width: 320, height: 600 });
     await checkMobileBarWhileSharing(page, 20);
+});
+
+async function checkHeaderWhileSharing(
+    page: Page,
+    widths: number[],
+    fontSize = 16,
+) {
+    await holdSharing(page);
+    await page.setViewportSize({ width: 40 * fontSize, height: 900 });
+    await page.goto("/create");
+    await mailAlternatives(page).click();
+    await page
+        .getByRole("menuitemcheckbox", { name: "Proton Mail", exact: true })
+        .click();
+    await page.keyboard.press("Escape");
+    const share = page.locator("#share-navbar");
+    await expect(share).toBeEnabled();
+
+    const expectFits = async (state: string) => {
+        for (const width of widths) {
+            await page.setViewportSize({ width, height: 900 });
+            const geometry = await page.evaluate(() => ({
+                rootFontSize: getComputedStyle(document.documentElement)
+                    .fontSize,
+                overflow: document.documentElement.scrollWidth - innerWidth,
+            }));
+            expect(geometry.rootFontSize).toBe(`${fontSize}px`);
+            expect(
+                geometry.overflow,
+                `${width}px ${state}`,
+            ).toBeLessThanOrEqual(0);
+            // Cross sm in both directions while a share is pending, too.
+            const placement = width < 40 * fontSize ? "mobile" : "navbar";
+            for (const action of ["share", "download"]) {
+                const button = page.locator(`#${action}-${placement}`);
+                await expect(button).toBeInViewport({ ratio: 1 });
+                expect(
+                    await button.evaluate(
+                        (element) => element.scrollWidth - element.clientWidth,
+                    ),
+                ).toBeLessThanOrEqual(0);
+                await expect(button).toHaveAccessibleName(
+                    action === "share" && state === "sharing"
+                        ? "SHARE (sharing)"
+                        : action.toUpperCase(),
+                );
+            }
+        }
+    };
+
+    await expectFits("ready");
+    await share.focus();
+    await page.keyboard.press("Enter");
+    await expect(share).toHaveAttribute("aria-disabled", "true");
+    await expect(share).toBeFocused();
+    await expect(share.locator(".animate-spin")).toBeVisible();
+    await expectFits("sharing");
+
+    // Resizing across sm can hide the focused button; focus the visible
+    // header again to check that settling the share preserves its focus.
+    await share.focus();
+    await page.evaluate(() =>
+        (window as unknown as { resolveShare: () => void }).resolveShare(),
+    );
+    await expect(share).toHaveAccessibleName("SHARE");
+    await expect(share).toBeEnabled();
+    await expect(share).toBeFocused();
+    await expectFits("shared");
+}
+
+test("the header fits around its breakpoints while sharing", async ({
+    page,
+}) => {
+    await checkHeaderWhileSharing(page, [639, 640, 657, 658, 767, 768]);
+});
+
+test("the header fits a larger default font while sharing", async ({
+    page,
+    browserName,
+}) => {
+    test.skip(
+        browserName !== "chromium",
+        "The default font size is set through Chromium CDP.",
+    );
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Page.setFontSizes", { fontSizes: { standard: 24 } });
+    await checkHeaderWhileSharing(page, [959, 960, 968, 969, 1151, 1152], 24);
 });
 
 /** How the pickers fail to fit the page at its current width, if they do. */

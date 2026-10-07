@@ -58,7 +58,16 @@ const PLACEMENTS = {
         labelClassName: "text-lg",
         iconSize: 16,
         hover: false,
-        preparingLabel: () => "PREPARING...",
+        // Side by side on a short screen, two PREPARING... labels can be
+        // wider than the screen, and with a larger font one can be wider
+        // than its button. So the buttons keep their own labels and the
+        // spinner shows progress; the hidden text keeps it in their names.
+        preparingLabel: (label: string) => (
+            <>
+                {label}
+                <span className="sr-only"> (preparing)</span>
+            </>
+        ),
     },
 };
 

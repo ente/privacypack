@@ -345,6 +345,99 @@ test("the header does not overflow while an image is preparing", async ({
     }
 });
 
+async function expectMobileBarFits(
+    page: Page,
+    state: string,
+    fontSize: number,
+) {
+    const { rootFontSize, overflow } = await page.evaluate(() => ({
+        rootFontSize: getComputedStyle(document.documentElement).fontSize,
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+    }));
+    // Chromium can drop a larger font size back to the default.
+    expect(rootFontSize, `the font size ${state}`).toBe(`${fontSize}px`);
+    expect(overflow, `the page overflows ${state}`).toBeLessThanOrEqual(0);
+    for (const id of ["#share-mobile", "#download-mobile"]) {
+        const button = page.locator(id);
+        await expect(button, `${id} ${state}`).toBeInViewport({ ratio: 1 });
+        // Nor do its spinner and label spill out of it.
+        expect(
+            await button.evaluate(
+                (element) => element.scrollWidth - element.clientWidth,
+            ),
+            `${id} ${state}`,
+        ).toBeLessThanOrEqual(0);
+    }
+}
+
+/** Picks an alternative and checks the mobile bar while and after preparing. */
+async function checkMobileBarWhilePreparing(page: Page, fontSize = 16) {
+    // Hold one logo back, so the image is still preparing when measured.
+    let release!: () => void;
+    const released = new Promise<void>((resolve) => {
+        release = resolve;
+    });
+    await page.route("**/app-logos/proton_mail.jpg*", async (route) => {
+        await released;
+        await route.continue();
+    });
+    await page.goto("/create");
+    await mailAlternatives(page).click();
+    await page
+        .getByRole("menuitemcheckbox")
+        .filter({ hasText: "Proton Mail" })
+        .click();
+    await page.keyboard.press("Escape");
+    const share = page.locator("#share-mobile");
+    const download = page.locator("#download-mobile");
+    await expect(share.locator(".animate-spin")).toBeVisible();
+    await expect(download.locator(".animate-spin")).toBeVisible();
+    await expectMobileBarFits(page, "while preparing", fontSize);
+    await expect(share).toHaveAccessibleName("SHARE (preparing)");
+    await expect(download).toHaveAccessibleName("DOWNLOAD (preparing)");
+
+    release();
+    await expect(share).toBeEnabled();
+    await expectMobileBarFits(page, "once prepared", fontSize);
+    await expect(share).toHaveAccessibleName("SHARE");
+    await expect(download).toHaveAccessibleName("DOWNLOAD");
+    await page.unroute("**/app-logos/proton_mail.jpg*");
+}
+
+for (const viewport of [
+    // 400% zoom of a 1280x900 window, where the buttons sit side by side.
+    { width: 320, height: 225 },
+    { width: 375, height: 667 },
+    // A landscape phone.
+    { width: 568, height: 320 },
+]) {
+    test(`the mobile export bar fits ${viewport.width}x${viewport.height} while an image is preparing`, async ({
+        page,
+    }) => {
+        await page.setViewportSize(viewport);
+        await checkMobileBarWhilePreparing(page);
+    });
+}
+
+test("the mobile export bar fits a larger default font while an image is preparing", async ({
+    page,
+    browserName,
+}) => {
+    test.skip(
+        browserName !== "chromium",
+        "The default font size is set through Chromium CDP.",
+    );
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Page.setFontSizes", { fontSizes: { standard: 32 } });
+
+    // 800px is under 30rem, a short screen. At 16rem the buttons sit side
+    // by side; narrower, they stack.
+    for (const width of [512, 320]) {
+        await page.setViewportSize({ width, height: 800 });
+        await checkMobileBarWhilePreparing(page, 32);
+    }
+});
+
 /** How the pickers fail to fit the page at its current width, if they do. */
 async function pickerFitProblems(page: Page, label: string) {
     const { overflow, squeezedArrows, spilledPickers, offscreenPickers } =

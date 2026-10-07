@@ -398,7 +398,8 @@ test("the header does not overflow while an image is preparing", async ({
         await route.continue();
     });
 
-    for (const width of [640, 700, 800]) {
+    // Either side of md, where the header's label changes.
+    for (const width of [640, 700, 767, 768, 800]) {
         await page.setViewportSize({ width, height: 900 });
         await page.goto("/create");
         await mailAlternatives(page).click();
@@ -414,6 +415,18 @@ test("the header does not overflow while an image is preparing", async ({
             ),
             `${width}px`,
         ).toBeLessThanOrEqual(0);
+        // The spinner is hidden from assistive technology, so the names
+        // must say the image is preparing.
+        for (const action of ["share", "download"]) {
+            await expect(
+                page.locator(`#${action}-navbar`),
+                `${width}px`,
+            ).toHaveAccessibleName(
+                width < 768
+                    ? `${action.toUpperCase()} (preparing)`
+                    : "PREPARING...",
+            );
+        }
         await expect(page.locator("#share-navbar")).toBeEnabled();
     }
 });

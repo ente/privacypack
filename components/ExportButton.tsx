@@ -42,10 +42,14 @@ const PLACEMENTS = {
         iconSize: 18,
         hover: true,
         // From sm to md the header has no room for the longer PREPARING...
-        // label; the spinner alone shows progress there.
+        // label. The spinner shows progress there, and the accessible name
+        // says it, as in the mobile bar.
         preparingLabel: (label: string) => (
             <>
-                <span className="md:hidden">{label}</span>
+                <span className="md:hidden">
+                    {label}
+                    <span className="sr-only"> (preparing)</span>
+                </span>
                 <span className="hidden md:inline">PREPARING...</span>
             </>
         ),

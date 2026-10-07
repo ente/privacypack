@@ -379,7 +379,8 @@
             "mainstream_apps": [
                 { "id": "discord", "name": "Discord" },
                 { "id": "guilded", "name": "Guilded" },
-                { "id": "slack", "name": "Slack" }
+                { "id": "slack", "name": "Slack" },
+                { "id": "mattermost", "name": "Mattermost" }
             ],
             "private_alternatives": [
                 { "id": "matrix", "name": "Matrix" },

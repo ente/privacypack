@@ -822,6 +822,9 @@ for (const fontSize of [24, 32]) {
                 );
                 await page.keyboard.press("Escape");
                 await menu.waitFor({ state: "detached" });
+                // Radix hands focus back to the picker just after the menu
+                // goes; pressing the next picker first can lose it to this.
+                await expect(pickers.nth(index)).toBeFocused();
             }
 
             // Chromium can drop the font size back to the default.

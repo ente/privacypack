@@ -355,7 +355,9 @@ test("mouse users can select apps and dismiss either picker", async ({
 
     await alternativePicker.click();
     await expect(page.getByRole("menu")).toBeVisible();
-    await page.mouse.click(16, 95);
+    // Raw input can beat Radix's deferred outside-dismiss listener. Keep the
+    // same outside point and use the locator's actionability waits.
+    await page.locator("body").click({ position: { x: 16, y: 95 } });
     await expect(page.getByRole("menu")).toHaveCount(0);
     await expect(alternativePicker).toContainText("Proton Mail");
 });

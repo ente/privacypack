@@ -105,6 +105,8 @@ PrivacyPack is distributed under the [MIT license](/LICENSE).
 
 ### App logo credits
 
+The [Debian Open Use Logo](https://www.debian.org/logos/openlogo-nd.svg) was created by Raul Silva and is copyright © 1999 Software in the Public Interest, Inc. It is used under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), one of the licenses offered on the [Debian logo page](https://www.debian.org/logos/). `public/app-logos/debian.jpg` is a proportionally resized version with white padding, converted to JPEG, and retains the same license.
+
 The [HeliBoard icon](https://github.com/HeliBorg/HeliBoard/blob/bc2b91189d60692090bcf30448ba35a9feef8110/fastlane/metadata/android/en-US/images/icon.png) is by [Fabian OvrWrt](https://github.com/FabianOvrWrt), with contributions from [The Eclectic Dyslexic](https://github.com/the-eclectic-dyslexic), and is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). `public/app-logos/heliboard.jpg` is a resized version with white padding, converted to JPEG, and retains the same license.
 
 The [FlorisBoard icon](https://github.com/florisboard/florisboard/blob/fe1241f4921b3eae923571ff7a3e113a7e10d677/app/src/main/ic_app_icon_stable-playstore.png) is credited to [Nikolay Anzarov (@BloodRaven0)](https://github.com/BloodRaven0) in the [upstream README](https://github.com/florisboard/florisboard/blob/fe1241f4921b3eae923571ff7a3e113a7e10d677/README.md#used-libraries-components-and-icons). Its catalog JPEG was resized and given white padding.

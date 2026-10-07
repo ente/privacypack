@@ -61,7 +61,9 @@ function tabOutOfMenu(event: React.KeyboardEvent<HTMLDivElement>) {
                   trigger.compareDocumentPosition(element) &
                       Node.DOCUMENT_POSITION_FOLLOWING &&
                   !trigger.contains(element) &&
-                  !menu.contains(element) &&
+                  // Another menu can still be animating closed. Its items
+                  // disappear when it unmounts, taking focus with them.
+                  !element.closest("[data-radix-menu-content]") &&
                   element.tabIndex >= 0 &&
                   element.getClientRects().length > 0,
           );

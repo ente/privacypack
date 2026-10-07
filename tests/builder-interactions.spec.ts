@@ -371,6 +371,39 @@ test("Tab and Shift+Tab leave either picker's menu and close it", async ({
     await expect(last).toBeFocused();
 });
 
+test("Tab past the last picker skips another menu still closing", async ({
+    page,
+}) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/create");
+    // Hold the real closing animation long enough to test the overlap
+    // without racing its normal 150 ms duration.
+    await page.addStyleTag({
+        content:
+            '[data-radix-menu-content][data-state="closed"] { animation-duration: 2s !important; }',
+    });
+    const pickers = page.locator('button[data-slot="dropdown-menu-trigger"]');
+    const penultimate = pickers.nth((await pickers.count()) - 2);
+    const last = pickers.last();
+    const openMenu = page.locator('[role="menu"][data-state="open"]');
+    const closingMenu = page.locator('[role="menu"][data-state="closed"]');
+
+    await penultimate.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(openMenu).toHaveCount(1);
+    await page.keyboard.press("Tab");
+    await expect(last).toBeFocused();
+    await expect(closingMenu).toHaveCount(1);
+    await page.keyboard.press("ArrowDown");
+    await expect(openMenu).toHaveCount(1);
+    await page.keyboard.press("Tab");
+    await expect(openMenu).toHaveCount(0);
+    await expect(last).toBeFocused();
+    // It must keep focus after both menus finish closing and unmount.
+    await expect(page.getByRole("menu")).toHaveCount(0);
+    await expect(last).toBeFocused();
+});
+
 test("mouse users can select apps and dismiss either picker", async ({
     page,
 }) => {

@@ -29,7 +29,9 @@
                 { "id": "google_photos", "name": "Google Photos" },
                 { "id": "apple_photos", "name": "Apple Photos" },
                 { "id": "amazon_photos", "name": "Amazon Photos" },
-                { "id": "dropbox", "name": "Dropbox" }
+                { "id": "dropbox", "name": "Dropbox" },
+                { "id": "microsoft_photos", "name": "Microsoft Photos" },
+                { "id": "onedrive", "name": "OneDrive" }
             ],
             "private_alternatives": [
                 { "id": "jottacloud", "name": "Jottacloud" },
@@ -101,7 +103,8 @@
                 { "id": "telegram", "name": "Telegram" },
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "google_messages", "name": "Google Messages" },
-                { "id": "google_chat", "name": "Google Chat" }
+                { "id": "google_chat", "name": "Google Chat" },
+                { "id": "microsoft_teams", "name": "Microsoft Teams" }
             ],
             "private_alternatives": [
                 { "id": "signal", "name": "Signal" },
@@ -124,7 +127,8 @@
                 { "id": "google_keep", "name": "Google Keep" },
                 { "id": "apple_notes", "name": "Apple Notes" },
                 { "id": "evernote", "name": "Evernote" },
-                { "id": "notion", "name": "Notion" }
+                { "id": "notion", "name": "Notion" },
+                { "id": "onenote", "name": "OneNote" }
             ],
             "private_alternatives": [
                 { "id": "standard_notes", "name": "Standard Notes" },
@@ -178,7 +182,8 @@
                 { "id": "lastpass", "name": "LastPass" },
                 { "id": "apple_passwords", "name": "Apple Passwords" },
                 { "id": "nordpass", "name": "NordPass" },
-                { "id": "dashlane", "name": "Dashlane" }
+                { "id": "dashlane", "name": "Dashlane" },
+                { "id": "edge", "name": "Microsoft Password Manager" }
             ],
             "private_alternatives": [
                 { "id": "bitwarden", "name": "Bitwarden" },
@@ -238,7 +243,8 @@
             "name": "Contacts",
             "order": 11,
             "mainstream_apps": [
-                { "id": "google_contacts", "name": "Google Contacts" }
+                { "id": "google_contacts", "name": "Google Contacts" },
+                { "id": "outlook", "name": "Outlook Contacts" }
             ],
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
@@ -354,7 +360,8 @@
             "mainstream_apps": [
                 { "id": "google_translate", "name": "Google Translate" },
                 { "id": "apple_translate", "name": "Apple Translate" },
-                { "id": "deepl", "name": "DeepL" }
+                { "id": "deepl", "name": "DeepL" },
+                { "id": "microsoft_translator", "name": "Microsoft Translator" }
             ],
             "private_alternatives": [
                 { "id": "libretranslate", "name": "LibreTranslate" },
@@ -391,7 +398,8 @@
                 { "id": "threads", "name": "Threads" },
                 { "id": "x", "name": "𝕏" },
                 { "id": "reddit", "name": "Reddit" },
-                { "id": "youtube", "name": "YouTube" }
+                { "id": "youtube", "name": "YouTube" },
+                { "id": "linkedin", "name": "LinkedIn" }
             ],
             "private_alternatives": [
                 { "id": "minds", "name": "Minds" },

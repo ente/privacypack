@@ -16,6 +16,8 @@ const jetBrainsMono = localFont({
         "Noto Sans Mono",
         "monospace",
     ],
+    // For menus, which are portalled to <body>, outside the wrapper below.
+    variable: "--font-jetbrains-mono",
 });
 
 export const metadata: Metadata = {
@@ -55,8 +57,15 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${jetBrainsMono.className} antialiased`}>
-                {children}
+            <body className={`${jetBrainsMono.variable} antialiased`}>
+                {/* The page font is set on this wrapper, not on <body>. An
+                    export renders a copy of <body> that holds only the
+                    capture copy (lib/export-image.ts). When the web font is
+                    unavailable nothing there may name it, or WebKit starts
+                    loading it for <body> and the render waits for that. */}
+                <div className={`${jetBrainsMono.className} contents`}>
+                    {children}
+                </div>
             </body>
         </html>
     );

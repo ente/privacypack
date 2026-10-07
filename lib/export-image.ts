@@ -496,6 +496,8 @@ function renderPrivacyPackInVirtualDOM() {
     // The off-screen copy is only for the renderer, not for screen readers.
     virtualDiv.setAttribute("aria-hidden", "true");
     virtualDiv.inert = true;
+    // Directly in <body>, outside the wrapper that sets the page font
+    // (app/layout.tsx), so its ancestors in the clone never name the font.
     document.body.appendChild(virtualDiv);
 
     return virtualDiv;

@@ -121,6 +121,11 @@ test("private alternative picker presents a multi-select menu", async ({
     await expect(
         page.getByRole("menuitemcheckbox").filter({ hasText: "Proton Mail" }),
     ).toBeVisible();
+    // The menu is portalled outside the page's font wrapper.
+    await expect(page.getByRole("menu")).toHaveCSS(
+        "font-family",
+        /jetBrainsMono/,
+    );
 });
 
 test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
@@ -148,7 +153,9 @@ test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
         });
 
         return {
-            bodyFont: window.getComputedStyle(document.body).fontFamily,
+            // The page font is set on a wrapper inside <body>, not on it.
+            pageFont: window.getComputedStyle(document.querySelector("main")!)
+                .fontFamily,
             exportFont: exportCard
                 ? window.getComputedStyle(exportCard).fontFamily
                 : "",
@@ -161,7 +168,7 @@ test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
         };
     });
 
-    expect(fontInfo.bodyFont).toContain("jetBrainsMono");
+    expect(fontInfo.pageFont).toContain("jetBrainsMono");
     expect(fontInfo.exportFont).toContain("jetBrainsMono");
     expect(fontInfo.jetBrainsLoaded).toBe(true);
     expect(

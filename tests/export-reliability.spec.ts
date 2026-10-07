@@ -1029,13 +1029,37 @@ test("a font that arrives during a fallback capture is not used in it", async ({
 test("a slow font falls back to a system font throughout, then recovers", async ({
     page,
 }) => {
-    // Record the font of every piece of text html2canvas draws.
+    // Record the font of every piece of text html2canvas draws, and which
+    // elements of its copy of the page name the web font.
     await page.addInitScript(() => {
-        const state = window as typeof window & { drawnFonts: string[] };
+        const state = window as typeof window & {
+            drawnFonts: string[];
+            cloneWebFont: string[][];
+        };
         state.drawnFonts = [];
+        state.cloneWebFont = [];
+        const sampled = new WeakSet<Document>();
         const fillText = CanvasRenderingContext2D.prototype.fillText;
         CanvasRenderingContext2D.prototype.fillText = function (...args) {
             state.drawnFonts.push(this.font);
+            document
+                .querySelectorAll<HTMLIFrameElement>(
+                    "iframe.html2canvas-container",
+                )
+                .forEach((frame) => {
+                    const clone = frame.contentDocument;
+                    if (!clone || sampled.has(clone)) return;
+                    sampled.add(clone);
+                    state.cloneWebFont.push(
+                        Array.from(clone.querySelectorAll("*"))
+                            .filter((element) =>
+                                clone.defaultView
+                                    ?.getComputedStyle(element)
+                                    .fontFamily.includes("jetBrainsMono"),
+                            )
+                            .map((element) => element.tagName),
+                    );
+                });
             return fillText.apply(this, args);
         };
     });
@@ -1043,6 +1067,13 @@ test("a slow font falls back to a system font throughout, then recovers", async 
         page.evaluate(() => {
             const state = window as typeof window & { drawnFonts: string[] };
             return state.drawnFonts.splice(0);
+        });
+    const cloneWebFont = () =>
+        page.evaluate(() => {
+            const state = window as typeof window & {
+                cloneWebFont: string[][];
+            };
+            return state.cloneWebFont.splice(0);
         });
     // Font requests stay pending until the test releases them, well past
     // the 8s the export waits for the font.
@@ -1085,6 +1116,12 @@ test("a slow font falls back to a system font throughout, then recovers", async 
     expect(
         fallbackFonts.filter((font) => font.includes("jetBrainsMono")),
     ).toEqual([]);
+    // Nor did any element of html2canvas's copy of the page name it, not
+    // even <body>: WebKit can load the font for any of them, and html2canvas
+    // waits for that before it renders.
+    const fallbackClones = await cloneWebFont();
+    expect(fallbackClones.length).toBeGreaterThan(0);
+    expect(fallbackClones.flat()).toEqual([]);
 
     // Once the font has arrived, the next image uses it and the notice goes.
     releaseFonts();

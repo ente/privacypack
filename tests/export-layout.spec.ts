@@ -122,7 +122,7 @@ for (const [alternativeCount, systemFont] of [
     test(`exports retain ${alternativeCount} ${alternativeCount === 1 ? "alternative" : "alternatives"} per category at every pack size${systemFont ? " in the system font" : ""}`, async ({
         page,
     }, testInfo) => {
-        // 28 steps of about 3 seconds each locally; a CI runner managed one
+        // Each step took about 3 seconds locally; a CI runner managed one
         // every 4.2 seconds and timed out at the last step of 120 seconds.
         test.setTimeout(240_000);
         if (systemFont) {
@@ -341,7 +341,9 @@ for (const [alternativeCount, systemFont] of [
 
                 // The single-column start, both layout transitions and the
                 // densest pack are checked in the actual PNG.
-                if ([1, 12, 13, 20, 21, 28].includes(count)) {
+                if (
+                    [1, 12, 13, 20, 21, 28, categories.length].includes(count)
+                ) {
                     const [download] = await Promise.all([
                         page.waitForEvent("download"),
                         page.locator("#download-navbar").click(),

@@ -21,6 +21,8 @@ const ALTERNATIVE_ROW_GAP = 6;
 
 const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
     const smallColumnCount = Math.max(1, Math.min(pack.length, 3));
+    // Eight rows need shorter cards to stay within the 1500px canvas.
+    const compactDense = pack.length > 28;
     const layout =
         pack.length <= 12
             ? {
@@ -65,16 +67,15 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
                     gridTop: "142px",
                     gridTemplateColumns: "repeat(4, 1fr)",
                     columnGap: `${DENSE_COLUMN_GAP}px`,
-                    rowGap: "18px",
-                    cardClass:
-                        "h-[166px] w-full rounded-lg border border-white/8 bg-[#181818] px-3 py-2.5",
+                    rowGap: compactDense ? "14px" : "18px",
+                    cardClass: `${compactDense ? "h-[150px]" : "h-[166px]"} w-full rounded-lg border border-white/8 bg-[#181818] px-3 py-2.5`,
                     contentClass: "grid min-h-0 flex-1 items-center gap-x-2",
                     columns: "100px 22px minmax(0,1fr)",
                     mainstreamWidth: 100,
                     // The remainder after both fixed columns and two 8px gaps.
                     alternativesWidth: DENSE_CARD_CONTENT_WIDTH - 100 - 22 - 16,
-                    logoSize: 66,
-                    fontSize: 15,
+                    logoSize: compactDense ? 52 : 66,
+                    fontSize: compactDense ? 14 : 15,
                     alternativeLogoSize: 28,
                     alternativeFontSize: 14,
                     alternativeGapClass: "gap-1",

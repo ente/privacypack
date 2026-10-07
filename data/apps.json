@@ -343,7 +343,8 @@
             "order": 16,
             "mainstream_apps": [
                 { "id": "google_maps", "name": "Google Maps" },
-                { "id": "apple_maps", "name": "Apple Maps" }
+                { "id": "apple_maps", "name": "Apple Maps" },
+                { "id": "waze", "name": "Waze" }
             ],
             "private_alternatives": [
                 { "id": "comaps", "name": "CoMaps" },
@@ -399,7 +400,10 @@
                 { "id": "x", "name": "𝕏" },
                 { "id": "reddit", "name": "Reddit" },
                 { "id": "youtube", "name": "YouTube" },
-                { "id": "linkedin", "name": "LinkedIn" }
+                { "id": "linkedin", "name": "LinkedIn" },
+                { "id": "tiktok", "name": "TikTok" },
+                { "id": "snapchat", "name": "Snapchat" },
+                { "id": "pinterest", "name": "Pinterest" }
             ],
             "private_alternatives": [
                 { "id": "minds", "name": "Minds" },

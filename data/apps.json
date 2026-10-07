@@ -239,7 +239,8 @@
                 { "id": "nextcloud_calendar", "name": "Nextcloud Calendar" },
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
-                { "id": "murena_workspace", "name": "Murena Calendar" }
+                { "id": "murena_workspace", "name": "Murena Calendar" },
+				{ "id": "caldav", "name": "CalDAV" }
             ]
         },
         {
@@ -252,7 +253,8 @@
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
                 { "id": "proton_mail", "name": "Proton Contacts" },
-                { "id": "tuta_mail", "name": "Tuta Contacts" }
+                { "id": "tuta_mail", "name": "Tuta Contacts" },
+				{ "id": "carddav", "name": "CardDAV" }
             ]
         },
         {

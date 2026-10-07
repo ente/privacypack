@@ -66,7 +66,7 @@ Next.js 16 compiles for Chrome, Edge and Firefox 111 and Safari 16.4 or later, a
 
 The card is drawn in the browser from the hidden `components/PrivacyPackResult.tsx` with html2canvas into a 3000×3000 PNG. Nothing is uploaded. An image is prepared after each change, once no picker is open, so that Share can call the Web Share API directly from the tap. Without file sharing, Share copies the image to the clipboard, or downloads it.
 
-The card uses the bundled JetBrains Mono font. If it cannot be loaded, for example because a content blocker or iOS Lockdown Mode blocks web fonts, the image uses a system monospace font and the page says so. Each image is fetched once and embedded in the capture, so html2canvas never fetches images itself, and an image that cannot load fails the export rather than leaving a gap.
+The card uses the bundled JetBrains Mono font. If it cannot be loaded, for example because a content blocker or iOS Lockdown Mode blocks web fonts, the image uses a system monospace font and the page says so. Each image is fetched once and embedded in the capture, so html2canvas never fetches images itself, and an image that cannot load fails the export rather than leaving a gap. `app/JetBrainsMono.woff2` is a losslessly compressed copy of `app/JetBrainsMono.ttf`, with all glyphs retained; the TTF remains the source. It was generated with FontTools 4.60.2 using `fonttools ttLib.woff2 compress app/JetBrainsMono.ttf`.
 
 ### Dependency versions
 

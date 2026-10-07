@@ -467,7 +467,7 @@ test("a failed font download is recovered for export", async ({
     // The page's own font URL keeps failing (a broken cache entry, say); a
     // fresh download from another URL works.
     const fontRequests: string[] = [];
-    await page.route("**/_next/static/media/*.ttf*", (route) => {
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", (route) => {
         const search = new URL(route.request().url()).search;
         fontRequests.push(search);
         return search ? route.continue() : route.abort();
@@ -536,7 +536,7 @@ test("a blocked font still exports, in a system font, and says so", async ({
     page,
 }) => {
     // Content blockers and iOS Lockdown Mode can block web fonts.
-    await page.route("**/_next/static/media/*.ttf*", (route) =>
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", (route) =>
         route.abort("blockedbyclient"),
     );
     await page.goto("/create");
@@ -556,7 +556,7 @@ test("a blocked font still exports, in a system font, and says so", async ({
 test("the system font notice stays while the pack is edited, so the page does not move", async ({
     page,
 }) => {
-    await page.route("**/_next/static/media/*.ttf*", (route) =>
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", (route) =>
         route.abort("blockedbyclient"),
     );
     await page.goto("/create");
@@ -1035,7 +1035,7 @@ test("a font that arrives during a fallback capture is not used in it", async ({
     const fontsReleased = new Promise<void>(
         (resolve) => (releaseFonts = resolve),
     );
-    await page.route("**/_next/static/media/*.ttf*", async (route) => {
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", async (route) => {
         await fontsReleased;
         await route.continue().catch(() => undefined);
     });
@@ -1157,7 +1157,7 @@ test("a slow font falls back to a system font throughout, then recovers", async 
     const fontsReleased = new Promise<void>(
         (resolve) => (releaseFonts = resolve),
     );
-    await page.route("**/_next/static/media/*.ttf*", async (route) => {
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", async (route) => {
         await fontsReleased;
         await route.continue().catch(() => undefined);
     });

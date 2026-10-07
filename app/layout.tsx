@@ -4,7 +4,8 @@ import { getAssetUrl } from "@/lib/assets";
 import "./globals.css";
 
 const jetBrainsMono = localFont({
-    src: "./JetBrainsMono.ttf",
+    // Lossless WOFF2 of the adjacent TTF source; all glyphs are retained.
+    src: "./JetBrainsMono.woff2",
     // If the font is blocked and there is no Arial for next/font's fallback
     // (Linux), keep the page monospace rather than the browser default.
     // The same list as SYSTEM_MONO_FAMILY in lib/export-image.ts.

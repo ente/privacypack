@@ -1442,7 +1442,7 @@ test("a clipped message in the mobile bar scrolls from the keyboard", async ({
     // 400% zoom of a 1280x900 window, with a blocked web font: the notice
     // about the system font is longer than the bar shows.
     await page.setViewportSize({ width: 320, height: 225 });
-    await page.route("**/_next/static/media/*.ttf*", (route) =>
+    await page.route("**/_next/static/media/*.{ttf,woff2}*", (route) =>
         route.abort("blockedbyclient"),
     );
     await page.goto("/create");

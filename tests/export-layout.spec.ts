@@ -126,7 +126,7 @@ for (const [alternativeCount, systemFont] of [
         // every 4.2 seconds and timed out at the last step of 120 seconds.
         test.setTimeout(240_000);
         if (systemFont) {
-            await page.route("**/_next/static/media/*.ttf*", (route) =>
+            await page.route("**/_next/static/media/*.{ttf,woff2}*", (route) =>
                 route.abort("blockedbyclient"),
             );
         }

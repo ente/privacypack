@@ -453,6 +453,84 @@ test("the mobile export bar fits a larger default font while an image is prepari
     }
 });
 
+/** Shares from the mobile bar and checks it while and after sharing. */
+async function checkMobileBarWhileSharing(page: Page, fontSize = 16) {
+    // Hold the share sheet open until the test resolves it.
+    await page.addInitScript(() => {
+        const held = window as unknown as { resolveShare: () => void };
+        Object.defineProperty(navigator, "canShare", {
+            configurable: true,
+            value: () => true,
+        });
+        Object.defineProperty(navigator, "share", {
+            configurable: true,
+            value: () =>
+                new Promise<void>((resolve) => {
+                    held.resolveShare = resolve;
+                }),
+        });
+    });
+    await page.goto("/create");
+    await mailAlternatives(page).click();
+    await page
+        .getByRole("menuitemcheckbox")
+        .filter({ hasText: "Proton Mail" })
+        .click();
+    await page.keyboard.press("Escape");
+    const share = page.locator("#share-mobile");
+    const download = page.locator("#download-mobile");
+    await expect(share).toBeEnabled();
+    await share.focus();
+    await page.keyboard.press("Enter");
+    await expect(share.locator(".animate-spin")).toBeVisible();
+    await expectMobileBarFits(page, "while sharing", fontSize);
+    // Share keeps focus, so its name says what it is doing.
+    await expect(share).toBeFocused();
+    await expect(share).toHaveAccessibleName("SHARE (sharing)");
+    await expect(download).toHaveAccessibleName("DOWNLOAD");
+
+    await page.evaluate(() =>
+        (window as unknown as { resolveShare: () => void }).resolveShare(),
+    );
+    await expect(share).toBeEnabled();
+    await expectMobileBarFits(page, "once shared", fontSize);
+    await expect(share).toBeFocused();
+    await expect(share).toHaveAccessibleName("SHARE");
+    await expect(download).toHaveAccessibleName("DOWNLOAD");
+}
+
+for (const viewport of [
+    // Side by side on short screens from 256px, where the buttons are
+    // narrowest.
+    { width: 256, height: 400 },
+    { width: 268, height: 225 },
+    // 400% zoom of a 1280x900 window.
+    { width: 320, height: 225 },
+]) {
+    test(`the mobile export bar fits ${viewport.width}x${viewport.height} while sharing`, async ({
+        page,
+    }) => {
+        await page.setViewportSize(viewport);
+        await checkMobileBarWhileSharing(page);
+    });
+}
+
+test("the mobile export bar fits a larger default font while sharing", async ({
+    page,
+    browserName,
+}) => {
+    test.skip(
+        browserName !== "chromium",
+        "The default font size is set through Chromium CDP.",
+    );
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Page.setFontSizes", { fontSizes: { standard: 20 } });
+
+    // 600px is 30rem and 320px is 16rem, so the buttons sit side by side.
+    await page.setViewportSize({ width: 320, height: 600 });
+    await checkMobileBarWhileSharing(page, 20);
+});
+
 /** How the pickers fail to fit the page at its current width, if they do. */
 async function pickerFitProblems(page: Page, label: string) {
     const { overflow, squeezedArrows, spilledPickers, offscreenPickers } =

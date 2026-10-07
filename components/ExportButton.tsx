@@ -52,20 +52,28 @@ const PLACEMENTS = {
                 <span className="hidden md:inline">PREPARING...</span>
             </>
         ),
+        busyLabel: undefined,
     },
     mobile: {
         className: "flex h-12 w-full",
         labelClassName: "text-lg",
         iconSize: 16,
         hover: false,
-        // Side by side on a short screen, two PREPARING... labels can be
-        // wider than the screen, and with a larger font one can be wider
-        // than its button. So the buttons keep their own labels and the
-        // spinner shows progress; the hidden text keeps it in their names.
+        // Side by side on a short screen, two PREPARING... labels or a
+        // SHARING... label can be wider than the screen, and with a larger
+        // font one can be wider than its button. So the buttons keep their
+        // own labels and the spinner shows progress; the hidden text keeps
+        // it in their names. Only Share is ever busy.
         preparingLabel: (label: string) => (
             <>
                 {label}
                 <span className="sr-only"> (preparing)</span>
+            </>
+        ),
+        busyLabel: (label: string) => (
+            <>
+                {label}
+                <span className="sr-only"> (sharing)</span>
             </>
         ),
     },
@@ -140,7 +148,9 @@ export default function ExportButton({
                 {preparing
                     ? placementStyle.preparingLabel(label)
                     : busy
-                      ? (busyLabel ?? label)
+                      ? (placementStyle.busyLabel?.(label) ??
+                        busyLabel ??
+                        label)
                       : label}
             </span>
         </button>

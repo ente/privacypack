@@ -288,6 +288,9 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
 // Image bytes as data: URLs, by absolute URL. Public images are served with
 // a content version in the URL, so the bytes behind a URL never change.
 const inlinedImages = new Map<string, Promise<string>>();
+// Images whose bytes did not decode. The browser's HTTP cache can hold the
+// same broken response, so the next fetch must go to the network.
+const undecodableImages = new Set<string>();
 
 function readAsDataUrl(blob: Blob) {
     return new Promise<string>((resolve, reject) => {
@@ -310,7 +313,7 @@ function inlineImage(url: string) {
             EXPORT_RESOURCE_TIMEOUT_MS,
         );
         dataUrl = fetch(url, {
-            cache: "force-cache",
+            cache: undecodableImages.delete(url) ? "reload" : "force-cache",
             signal: controller.signal,
         })
             .then((response) => {
@@ -332,6 +335,13 @@ function inlineImage(url: string) {
     return dataUrl;
 }
 
+/** The inlinedImages key for an export image, if its bytes are inlined. */
+function inlinedImageUrl(image: HTMLImageElement) {
+    const src = image.dataset.exportSrc || image.getAttribute("src");
+    if (!src || src.startsWith("data:")) return null;
+    return new URL(src, document.baseURI).href;
+}
+
 /**
  * html2canvas loads every image again while it renders, and leaves out any
  * image that fails then, which would yield a PNG with a missing logo. Give
@@ -341,10 +351,10 @@ function inlineImage(url: string) {
 async function inlineImages(container: HTMLElement, signal?: AbortSignal) {
     await Promise.all(
         Array.from(container.querySelectorAll("img")).map(async (image) => {
-            const src = image.dataset.exportSrc || image.getAttribute("src");
-            if (!src || src.startsWith("data:")) return;
+            const url = inlinedImageUrl(image);
+            if (!url) return;
             image.src = await waitForResource(
-                inlineImage(new URL(src, document.baseURI).href),
+                inlineImage(url),
                 `Timed out loading ${image.alt || "an export image"}.`,
                 signal,
             );
@@ -373,12 +383,21 @@ function waitForImages(container: HTMLElement, signal?: AbortSignal) {
                         if (error) reject(error);
                         else resolve();
                     };
-                    const onError = () =>
+                    const onError = () => {
+                        if (settled) return;
+                        // Bytes that arrived but do not decode must not be
+                        // reused, or every Retry would fail on them again.
+                        const url = inlinedImageUrl(image);
+                        if (url) {
+                            inlinedImages.delete(url);
+                            undecodableImages.add(url);
+                        }
                         finish(
                             new Error(
                                 `Could not load ${image.alt || "an export image"}.`,
                             ),
                         );
+                    };
                     const onAbort = () => finish(abortError());
                     const onLoad = () => {
                         if (

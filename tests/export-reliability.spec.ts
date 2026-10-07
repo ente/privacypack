@@ -888,6 +888,61 @@ test("an image served without an image type fails the export, not the PNG", asyn
     expect((await cardImagesInPng(page)).unpainted).toEqual([]);
 });
 
+test("an image that cannot be decoded is fetched again on Retry", async ({
+    page,
+}) => {
+    // The first fetch of the header wordmark succeeds as an image/png, but
+    // its bytes stop before any image data, so it fails to decode. Later
+    // fetches are whole.
+    // The browser may have cached the broken response, so the fetch on
+    // Retry must bypass its cache.
+    await page.addInitScript(() => {
+        const state = window as typeof window & { logoCacheModes: string[] };
+        state.logoCacheModes = [];
+        const fetch = window.fetch;
+        window.fetch = (input, init) => {
+            if (String(input).includes("url-logo.png")) {
+                state.logoCacheModes.push(init?.cache ?? "default");
+            }
+            return fetch(input, init);
+        };
+    });
+    let fetches = 0;
+    await page.route("**/url-logo.png*", async (route) => {
+        if (route.request().resourceType() !== "fetch") return route.continue();
+        fetches++;
+        if (fetches > 1) return route.continue();
+        const response = await route.fetch();
+        const body = await response.body();
+        return route.fulfill({
+            status: 200,
+            contentType: "image/png",
+            body: body.subarray(0, 64),
+        });
+    });
+    await page.goto("/create");
+    await selectMail(page);
+    await expect(
+        page.getByRole("alert").filter({ hasText: "Export failed" }),
+    ).toBeVisible();
+    expect(fetches).toBe(1);
+    await expect(page.locator("#download-navbar")).toBeDisabled();
+
+    await page.getByRole("button", { name: "Retry export" }).click();
+    await expect(page.locator("#download-navbar")).toBeEnabled();
+    expect(fetches).toBe(2);
+    expect(
+        await page.evaluate(
+            () =>
+                (window as typeof window & { logoCacheModes: string[] })
+                    .logoCacheModes,
+        ),
+    ).toEqual(["force-cache", "reload"]);
+    const images = await cardImagesInPng(page);
+    expect(images.checked).toContain("PrivacyPack Logo");
+    expect(images.unpainted).toEqual([]);
+});
+
 test("a font that arrives during a fallback capture is not used in it", async ({
     page,
 }) => {

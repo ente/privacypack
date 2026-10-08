@@ -379,7 +379,8 @@
                 { "id": "apertium", "name": "Apertium" },
                 { "id": "mozilla_translate", "name": "Mozilla Translate" },
                 { "id": "kagi_translate", "name": "Kagi Translate" },
-                { "id": "brave_translate", "name": "Brave Translate" }
+                { "id": "brave_translate", "name": "Brave Translate" },
+				{ "id": "reverso", "name": "Reverso" }
             ]
         },
         {

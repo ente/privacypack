@@ -120,7 +120,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "keet", "name": "Keet"}
             ]
         },
         {
@@ -199,7 +200,8 @@
                 { "id": "aliasvault", "name": "AliasVault" },
                 { "id": "gopass", "name": "Gopass" },
                 { "id": "vaultwarden", "name": "Vaultwarden" },
-                { "id": "murena_workspace", "name": "Murena Passwords" }
+                { "id": "murena_workspace", "name": "Murena Passwords" },
+                { "id": "pearpass", "name": "PearPass"}
             ]
         },
         {
@@ -224,7 +226,8 @@
                 { "id": "1password", "name": "1Password" },
                 { "id": "vaultwarden", "name": "Vaultwarden" },
                 { "id": "stratum", "name": "Stratum" },
-                { "id": "2fas_auth", "name": "2FAS Auth" }
+                { "id": "2fas_auth", "name": "2FAS Auth" },
+                { "id": "pearpass", "name": "PearPass"}
             ]
         },
         {

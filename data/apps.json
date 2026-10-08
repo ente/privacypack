@@ -488,6 +488,7 @@
                 { "id": "cloudflare", "name": "Cloudflare DNS" },
                 { "id": "nextdns", "name": "NextDNS" },
                 { "id": "adguard", "name": "AdGuard DNS" },
+                { "id": "decloudus", "name": "DeCloudUs DNS" },
                 { "id": "quad9", "name": "Quad9 DNS" },
                 { "id": "mullvad_dns", "name": "Mullvad DNS" },
                 { "id": "opennic", "name": "OpenNIC" }

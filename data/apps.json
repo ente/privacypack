@@ -297,7 +297,8 @@
                 { "id": "duckduckgo", "name": "DuckDuckGo VPN" },
                 { "id": "nymvpn", "name": "NymVPN" },
                 { "id": "tor_vpn", "name": "Tor VPN" },
-                { "id": "pia_vpn", "name": "PIA VPN" }
+                { "id": "pia_vpn", "name": "PIA VPN" },
+				{ "id": "Orbot", "name": "Orbot" }
             ]
         },
         {

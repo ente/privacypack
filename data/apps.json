@@ -81,6 +81,7 @@
                 { "id": "zen_browser", "name": "Zen Browser" },
                 { "id": "vanadium", "name": "Vanadium" },
                 { "id": "brave", "name": "Brave" },
+                { "id": "brave_origin", "name": "Brave Origin" },
                 { "id": "cromite", "name": "Cromite" },
                 { "id": "firefox", "name": "Firefox" },
                 { "id": "floorp", "name": "Floorp" },

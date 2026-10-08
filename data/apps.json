@@ -216,6 +216,7 @@
                 { "id": "aegis_auth", "name": "Aegis Auth" },
                 { "id": "freeotp", "name": "FreeOTP" },
                 { "id": "proton_auth", "name": "Proton Auth" },
+                { "id": "keepassxc", "name": "KeePassXC" },
                 { "id": "bitwarden_auth", "name": "Bitwarden Auth" },
                 { "id": "yubico_auth", "name": "Yubico Authenticator" },
                 { "id": "1password", "name": "1Password" },

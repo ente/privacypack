@@ -344,7 +344,8 @@
                 { "id": "apple_homekit", "name": "Apple HomeKit" },
                 { "id": "openhab", "name": "OpenHAB" },
                 { "id": "domoticz", "name": "Domoticz" },
-                { "id": "iobroker", "name": "ioBroker" }
+                { "id": "iobroker", "name": "ioBroker" },
+                { "id": "zigbee2mqtt", "name": "Zigbee2mqtt" }
             ]
         },
         {

@@ -19,7 +19,9 @@
                 { "id": "startmail", "name": "StartMail" },
                 { "id": "runbox", "name": "Runbox" },
                 { "id": "disroot_webmail", "name": "Disroot webmail" },
-                { "id": "murena_workspace", "name": "Murena Email" }
+                { "id": "murena_workspace", "name": "Murena Email" },
+                { "id": "stalwart_mail", "name": "Stalwart Mail Server" }
+
             ]
         },
         {
@@ -120,7 +122,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "element", "name": "Element" }
             ]
         },
         {
@@ -141,6 +144,7 @@
                 { "id": "obsidian", "name": "Obsidian" },
                 { "id": "logseq", "name": "Logseq" },
                 { "id": "anytype", "name": "Anytype" },
+                { "id": "affine", "name": "AFFiNE" },
                 { "id": "nextcloud_notes", "name": "Nextcloud Notes" },
                 { "id": "qownnotes", "name": "QOwnNotes" },
                 { "id": "fileverse", "name": "DDocs.new" },
@@ -174,7 +178,8 @@
                 { "id": "ente_locker", "name": "Ente Locker" },
                 { "id": "pcloud", "name": "pCloud" },
                 { "id": "syncthing", "name": "Syncthing" },
-                { "id": "murena_workspace", "name": "Murena Workspace" }
+                { "id": "murena_workspace", "name": "Murena Workspace" },
+                { "id": "opencloud", "name": "OpenCloud" }
             ]
         },
         {
@@ -243,7 +248,9 @@
                 { "id": "nextcloud_calendar", "name": "Nextcloud Calendar" },
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
-                { "id": "murena_workspace", "name": "Murena Calendar" }
+                { "id": "murena_workspace", "name": "Murena Calendar" },
+                { "id": "stalwart_collaboration", "name": "Stalwart Collaboration" }
+
             ]
         },
         {
@@ -361,7 +368,8 @@
                 { "id": "organic_maps", "name": "Organic Maps" },
                 { "id": "kagi", "name": "Kagi Maps" },
                 { "id": "magic_earth", "name": "Magic Earth" },
-                { "id": "osmand", "name": "OsmAnd" }
+                { "id": "osmand", "name": "OsmAnd" },
+                { "id": "here_wego", "name": "HERE WeGo" }
             ]
         },
         {
@@ -436,7 +444,8 @@
                 { "id": "brave_talk", "name": "Brave Talk" },
                 { "id": "proton_meet", "name": "Proton Meet" },
                 { "id": "jitsi", "name": "Jitsi" },
-                { "id": "nextcloud_talk", "name": "Nextcloud Talk" }
+                { "id": "nextcloud_talk", "name": "Nextcloud Talk" },
+                { "id": "element_call", "name": "Element Call" }
             ]
         },
         {
@@ -514,7 +523,9 @@
                 { "id": "nixos", "name": "NixOS" },
                 { "id": "tiger_os", "name": "Tiger OS" },
                 { "id": "opensuse", "name": "openSUSE" },
-                { "id": "zorin_os", "name": "Zorin OS" }
+                { "id": "zorin_os", "name": "Zorin OS" },
+                { "id": "cachyos", "name": "CachyOS" }
+
             ]
         },
         {

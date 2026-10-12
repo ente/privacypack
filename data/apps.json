@@ -122,7 +122,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "element", "name": "Element" }
             ]
         },
         {
@@ -440,7 +441,8 @@
                 { "id": "brave_talk", "name": "Brave Talk" },
                 { "id": "proton_meet", "name": "Proton Meet" },
                 { "id": "jitsi", "name": "Jitsi" },
-                { "id": "nextcloud_talk", "name": "Nextcloud Talk" }
+                { "id": "nextcloud_talk", "name": "Nextcloud Talk" },
+                { "id": "element_call", "name": "Element Call" }
             ]
         },
         {

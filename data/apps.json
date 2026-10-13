@@ -19,7 +19,9 @@
                 { "id": "startmail", "name": "StartMail" },
                 { "id": "runbox", "name": "Runbox" },
                 { "id": "disroot_webmail", "name": "Disroot webmail" },
-                { "id": "murena_workspace", "name": "Murena Email" }
+                { "id": "murena_workspace", "name": "Murena Email" },
+                { "id": "stalwart_mail", "name": "Stalwart Mail Server" }
+
             ]
         },
         {

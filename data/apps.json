@@ -248,7 +248,9 @@
                 { "id": "nextcloud_calendar", "name": "Nextcloud Calendar" },
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
-                { "id": "murena_workspace", "name": "Murena Calendar" }
+                { "id": "murena_workspace", "name": "Murena Calendar" },
+                { "id": "stalwart_collaboration", "name": "Stalwart Collaboration" }
+
             ]
         },
         {

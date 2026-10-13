@@ -178,7 +178,8 @@
                 { "id": "ente_locker", "name": "Ente Locker" },
                 { "id": "pcloud", "name": "pCloud" },
                 { "id": "syncthing", "name": "Syncthing" },
-                { "id": "murena_workspace", "name": "Murena Workspace" }
+                { "id": "murena_workspace", "name": "Murena Workspace" },
+                { "id": "opencloud", "name": "OpenCloud" }
             ]
         },
         {

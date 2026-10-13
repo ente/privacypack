@@ -444,7 +444,8 @@
                 { "id": "brave_talk", "name": "Brave Talk" },
                 { "id": "proton_meet", "name": "Proton Meet" },
                 { "id": "jitsi", "name": "Jitsi" },
-                { "id": "nextcloud_talk", "name": "Nextcloud Talk" }
+                { "id": "nextcloud_talk", "name": "Nextcloud Talk" },
+                { "id": "element_call", "name": "Element Call" }
             ]
         },
         {

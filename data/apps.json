@@ -147,6 +147,7 @@
                 { "id": "joplin", "name": "Joplin" },
                 { "id": "fossify_notes", "name": "Fossify Notes" },
                 { "id": "murena_workspace", "name": "Murena Notes" },
+                { "id": "anchor", "name": "Anchor" }
                 { "id": "futo_notes", "name": "FUTO Notes" }
             ]
         },
@@ -256,7 +257,8 @@
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
                 { "id": "proton_mail", "name": "Proton Contacts" },
-                { "id": "tuta_mail", "name": "Tuta Contacts" }
+                { "id": "tuta_mail", "name": "Tuta Contacts" },
+                { "id": "nextcloud_contacts", "name": "Nextcloud Contacts" }
             ]
         },
         {
@@ -299,6 +301,16 @@
                 { "id": "nymvpn", "name": "NymVPN" },
                 { "id": "tor_vpn", "name": "Tor VPN" },
                 { "id": "pia_vpn", "name": "PIA VPN" }
+            ]
+        },
+        {
+            "name": "Mesh VPN",
+            "mainstream_apps": [
+                { "id": "tailscale", "name": "Tailscale" }
+            ],
+            "private_alternatives": [
+                { "id": "netbird", "name": "NetBird" },
+                { "id": "headscale", "name": "Headscale" }
             ]
         },
         {
@@ -490,7 +502,8 @@
                 { "id": "adguard", "name": "AdGuard DNS" },
                 { "id": "quad9", "name": "Quad9 DNS" },
                 { "id": "mullvad_dns", "name": "Mullvad DNS" },
-                { "id": "opennic", "name": "OpenNIC" }
+                { "id": "opennic", "name": "OpenNIC" },
+                { "id": "pi_hole", "name": "PiHole" }
             ]
         },
         {
@@ -514,7 +527,8 @@
                 { "id": "nixos", "name": "NixOS" },
                 { "id": "tiger_os", "name": "Tiger OS" },
                 { "id": "opensuse", "name": "openSUSE" },
-                { "id": "zorin_os", "name": "Zorin OS" }
+                { "id": "zorin_os", "name": "Zorin OS" },
+                { "id": "cachyos", "name": "CachyOS" }
             ]
         },
         {

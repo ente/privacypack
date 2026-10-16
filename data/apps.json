@@ -29,7 +29,9 @@
                 { "id": "google_photos", "name": "Google Photos" },
                 { "id": "apple_photos", "name": "Apple Photos" },
                 { "id": "amazon_photos", "name": "Amazon Photos" },
-                { "id": "dropbox", "name": "Dropbox" }
+                { "id": "dropbox", "name": "Dropbox" },
+                { "id": "microsoft_photos", "name": "Microsoft Photos" },
+                { "id": "onedrive", "name": "OneDrive" }
             ],
             "private_alternatives": [
                 { "id": "jottacloud", "name": "Jottacloud" },
@@ -50,7 +52,8 @@
             "order": 3,
             "mainstream_apps": [
                 { "id": "google_search", "name": "Google Search" },
-                { "id": "bing", "name": "Bing" }
+                { "id": "bing", "name": "Bing" },
+                { "id": "yahoo", "name": "Yahoo" }
             ],
             "private_alternatives": [
                 { "id": "kagi", "name": "Kagi" },
@@ -71,12 +74,14 @@
                 { "id": "chrome", "name": "Chrome" },
                 { "id": "safari", "name": "Safari" },
                 { "id": "edge", "name": "Edge" },
-                { "id": "opera", "name": "Opera" }
+                { "id": "opera", "name": "Opera" },
+                { "id": "samsung_internet", "name": "Samsung Internet" }
             ],
             "private_alternatives": [
                 { "id": "zen_browser", "name": "Zen Browser" },
                 { "id": "vanadium", "name": "Vanadium" },
                 { "id": "brave", "name": "Brave" },
+                { "id": "brave_origin", "name": "Brave Origin" },
                 { "id": "cromite", "name": "Cromite" },
                 { "id": "firefox", "name": "Firefox" },
                 { "id": "floorp", "name": "Floorp" },
@@ -101,7 +106,8 @@
                 { "id": "telegram", "name": "Telegram" },
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "google_messages", "name": "Google Messages" },
-                { "id": "google_chat", "name": "Google Chat" }
+                { "id": "google_chat", "name": "Google Chat" },
+                { "id": "microsoft_teams", "name": "Microsoft Teams" }
             ],
             "private_alternatives": [
                 { "id": "signal", "name": "Signal" },
@@ -124,7 +130,8 @@
                 { "id": "google_keep", "name": "Google Keep" },
                 { "id": "apple_notes", "name": "Apple Notes" },
                 { "id": "evernote", "name": "Evernote" },
-                { "id": "notion", "name": "Notion" }
+                { "id": "notion", "name": "Notion" },
+                { "id": "onenote", "name": "OneNote" }
             ],
             "private_alternatives": [
                 { "id": "standard_notes", "name": "Standard Notes" },
@@ -141,6 +148,7 @@
                 { "id": "fossify_notes", "name": "Fossify Notes" },
                 { "id": "murena_workspace", "name": "Murena Notes" },
                 { "id": "anchor", "name": "Anchor" }
+                { "id": "futo_notes", "name": "FUTO Notes" }
             ]
         },
         {
@@ -179,7 +187,8 @@
                 { "id": "lastpass", "name": "LastPass" },
                 { "id": "apple_passwords", "name": "Apple Passwords" },
                 { "id": "nordpass", "name": "NordPass" },
-                { "id": "dashlane", "name": "Dashlane" }
+                { "id": "dashlane", "name": "Dashlane" },
+                { "id": "edge", "name": "Microsoft Password Manager" }
             ],
             "private_alternatives": [
                 { "id": "bitwarden", "name": "Bitwarden" },
@@ -201,13 +210,16 @@
                 { "id": "google_auth", "name": "Google Auth" },
                 { "id": "microsoft_auth", "name": "Microsoft Auth" },
                 { "id": "authy", "name": "Authy" },
-                { "id": "apple_passwords", "name": "Apple Passwords" }
+                { "id": "apple_passwords", "name": "Apple Passwords" },
+                { "id": "duo_mobile", "name": "Duo Mobile" }
             ],
             "private_alternatives": [
                 { "id": "ente_auth", "name": "Ente Auth" },
                 { "id": "aegis_auth", "name": "Aegis Auth" },
                 { "id": "freeotp", "name": "FreeOTP" },
                 { "id": "proton_auth", "name": "Proton Auth" },
+                { "id": "keepassxc", "name": "KeePassXC" },
+                { "id": "proton_pass", "name": "Proton Pass" },
                 { "id": "bitwarden_auth", "name": "Bitwarden Auth" },
                 { "id": "yubico_auth", "name": "Yubico Authenticator" },
                 { "id": "1password", "name": "1Password" },
@@ -239,7 +251,8 @@
             "name": "Contacts",
             "order": 11,
             "mainstream_apps": [
-                { "id": "google_contacts", "name": "Google Contacts" }
+                { "id": "google_contacts", "name": "Google Contacts" },
+                { "id": "outlook", "name": "Outlook Contacts" }
             ],
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
@@ -253,12 +266,14 @@
             "order": 12,
             "mainstream_apps": [
                 { "id": "play_store", "name": "Play Store" },
-                { "id": "app_store", "name": "App Store" }
+                { "id": "app_store", "name": "App Store" },
+                { "id": "galaxy_store", "name": "Galaxy Store" }
             ],
             "private_alternatives": [
                 { "id": "app_store", "name": "App Store" },
                 { "id": "accrescent", "name": "Accrescent" },
                 { "id": "f_droid", "name": "F-Droid" },
+                { "id": "izzyondroid", "name": "IzzyOnDroid" },
                 { "id": "aurora_store", "name": "Aurora Store" },
                 { "id": "obtainium", "name": "Obtainium" }
             ]
@@ -349,7 +364,8 @@
             "order": 16,
             "mainstream_apps": [
                 { "id": "google_maps", "name": "Google Maps" },
-                { "id": "apple_maps", "name": "Apple Maps" }
+                { "id": "apple_maps", "name": "Apple Maps" },
+                { "id": "waze", "name": "Waze" }
             ],
             "private_alternatives": [
                 { "id": "comaps", "name": "CoMaps" },
@@ -366,7 +382,8 @@
             "mainstream_apps": [
                 { "id": "google_translate", "name": "Google Translate" },
                 { "id": "apple_translate", "name": "Apple Translate" },
-                { "id": "deepl", "name": "DeepL" }
+                { "id": "deepl", "name": "DeepL" },
+                { "id": "microsoft_translator", "name": "Microsoft Translator" }
             ],
             "private_alternatives": [
                 { "id": "libretranslate", "name": "LibreTranslate" },
@@ -403,7 +420,11 @@
                 { "id": "threads", "name": "Threads" },
                 { "id": "x", "name": "𝕏" },
                 { "id": "reddit", "name": "Reddit" },
-                { "id": "youtube", "name": "YouTube" }
+                { "id": "youtube", "name": "YouTube" },
+                { "id": "linkedin", "name": "LinkedIn" },
+                { "id": "tiktok", "name": "TikTok" },
+                { "id": "snapchat", "name": "Snapchat" },
+                { "id": "pinterest", "name": "Pinterest" }
             ],
             "private_alternatives": [
                 { "id": "minds", "name": "Minds" },
@@ -439,7 +460,9 @@
                 { "id": "zelle", "name": "Zelle" },
                 { "id": "cash_app", "name": "Cash App" },
                 { "id": "apple_pay", "name": "Apple Pay" },
-                { "id": "google_pay", "name": "Google Pay" }
+                { "id": "google_pay", "name": "Google Pay" },
+                { "id": "samsung_wallet", "name": "Samsung Wallet" },
+                { "id": "amazon_pay", "name": "Amazon Pay" }
             ],
             "private_alternatives": [
                 { "id": "cash", "name": "Cash" },
@@ -570,13 +593,31 @@
             "name": "Domain Hosting",
             "order": 28,
             "mainstream_apps": [
-                { "id": "godaddy", "name": "GoDaddy" }
+                { "id": "godaddy", "name": "GoDaddy" },
+                { "id": "namecheap", "name": "Namecheap" },
+                { "id": "squarespace", "name": "Squarespace" },
+                { "id": "wix", "name": "Wix" }
             ],
             "private_alternatives": [
                 { "id": "cloudflare", "name": "Cloudflare Registrar" },
                 { "id": "njalla", "name": "Njalla" },
                 { "id": "1984_hosting", "name": "1984 Hosting" },
                 { "id": "orangewebsite", "name": "OrangeWebsite" }
+            ]
+        },
+        {
+            "name": "Keyboard",
+            "order": 29,
+            "mainstream_apps": [
+                { "id": "gboard", "name": "Gboard" },
+                { "id": "samsung_keyboard", "name": "Samsung Keyboard" },
+                { "id": "swiftkey", "name": "SwiftKey" }
+            ],
+            "private_alternatives": [
+                { "id": "futo_keyboard", "name": "FUTO Keyboard" },
+                { "id": "heliboard", "name": "HeliBoard" },
+                { "id": "florisboard", "name": "FlorisBoard" },
+                { "id": "apple_keyboard", "name": "Apple Keyboard" }
             ]
         }
     ]

@@ -1,0 +1,4 @@
+# lib/asset-versions.json records hashes of the exact bytes in public/, so Git
+# must not rewrite line endings there (for example core.autocrlf on Windows).
+public/** -text
+lib/asset-versions.json text eol=lf

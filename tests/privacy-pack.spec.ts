@@ -121,6 +121,11 @@ test("private alternative picker presents a multi-select menu", async ({
     await expect(
         page.getByRole("menuitemcheckbox").filter({ hasText: "Proton Mail" }),
     ).toBeVisible();
+    // The menu is portalled outside the page's font wrapper.
+    await expect(page.getByRole("menu")).toHaveCSS(
+        "font-family",
+        /jetBrainsMono/,
+    );
 });
 
 test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
@@ -148,7 +153,9 @@ test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
         });
 
         return {
-            bodyFont: window.getComputedStyle(document.body).fontFamily,
+            // The page font is set on a wrapper inside <body>, not on it.
+            pageFont: window.getComputedStyle(document.querySelector("main")!)
+                .fontFamily,
             exportFont: exportCard
                 ? window.getComputedStyle(exportCard).fontFamily
                 : "",
@@ -161,7 +168,7 @@ test("export card uses JetBrains Mono for rendered text", async ({ page }) => {
         };
     });
 
-    expect(fontInfo.bodyFont).toContain("jetBrainsMono");
+    expect(fontInfo.pageFont).toContain("jetBrainsMono");
     expect(fontInfo.exportFont).toContain("jetBrainsMono");
     expect(fontInfo.jetBrainsLoaded).toBe(true);
     expect(
@@ -283,9 +290,11 @@ test("mobile layout keeps export controls visible and disabled until selection",
 
 test("touch users can open and select a private alternative on mobile", async ({
     browser,
-}) => {
+}, testInfo) => {
     const context = await browser.newContext({
-        baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
+        baseURL: testInfo.project.use.baseURL,
+        ignoreHTTPSErrors: testInfo.project.use.ignoreHTTPSErrors,
+        reducedMotion: testInfo.project.use.reducedMotion,
         viewport: { width: 320, height: 740 },
         isMobile: true,
         hasTouch: true,

@@ -5,6 +5,34 @@ body {
     background: #161616;
 }
 
+/* Below the sm breakpoint the export bar sticks to the bottom of the
+   viewport. Keep focused pickers scrolled clear of it. Once the page runs,
+   app/create/page.tsx sets the padding from the bar's measured height. */
+@media (max-width: 39.999rem) {
+    html {
+        scroll-padding-bottom: calc(9rem + env(safe-area-inset-bottom));
+    }
+}
+
+/* On short screens (landscape phones, 400% zoom) its buttons sit side by
+   side, so the bar covers less of the page. That takes about 14.5rem, more
+   than a narrow screen has with a larger default font. */
+@media (max-width: 39.999rem) and (max-height: 30rem) and (min-width: 16rem) {
+    html {
+        scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+}
+
+/* Where the bar's buttons would take half the screen, side by side (5rem)
+   or stacked (8.75rem), the bar stays at the end of the page and covers
+   nothing. A larger default font on a short screen does this. */
+@media (max-width: 39.999rem) and (max-height: 10rem),
+    (max-width: 15.999rem) and (max-height: 17.5rem) {
+    html {
+        scroll-padding-bottom: 0;
+    }
+}
+
 .green-text {
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMwvsIAAAJFAQj8cHnTAAAAAElFTkSuQmCC")
         repeat;
@@ -15,6 +43,20 @@ body {
 
 @theme inline {
     --breakpoint-xs: 24rem;
+    /* Narrower than this the create page stacks each pair of pickers. Side
+       by side they need two pickers (6.5rem each), the card's padding
+       (1.5rem), the page's padding (2rem) and a 24px arrow, which is 1.5rem
+       at the default font size and less at larger ones. Like every rem
+       breakpoint, it follows the browser's default font size, so a larger
+       font stacks the pickers on wider screens. */
+    --breakpoint-picker-row: 18rem;
+    /* The create page's pickers go to three columns, then to their largest
+       logos, only once those fit: three cards (25rem, then 31rem) and two
+       gaps (5rem, then 10rem), plus the page's 2rem padding and 2rem for a
+       scrollbar. Any narrower and the arrows between the pickers are
+       squeezed out and the grid overflows the page. */
+    --breakpoint-picker-xl: 89rem;
+    --breakpoint-picker-2xl: 117rem;
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);

@@ -64,7 +64,8 @@
                 { "id": "searxng", "name": "SearXNG" },
                 { "id": "mojeek", "name": "Mojeek" },
                 { "id": "qwant", "name": "Qwant" },
-                { "id": "murena_find", "name": "Murena Find" }
+                { "id": "murena_find", "name": "Murena Find" },
+                {"id": "ecosia", "name": "Ecosia" }
             ]
         },
         {
@@ -134,6 +135,7 @@
                 { "id": "onenote", "name": "OneNote" }
             ],
             "private_alternatives": [
+                {"id": "trudido", "name": "Trudido" },
                 { "id": "standard_notes", "name": "Standard Notes" },
                 { "id": "memos", "name": "Memos" },
                 { "id": "notesnook", "name": "Notesnook" },

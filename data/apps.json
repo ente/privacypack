@@ -606,7 +606,8 @@
                 { "id": "futo_keyboard", "name": "FUTO Keyboard" },
                 { "id": "heliboard", "name": "HeliBoard" },
                 { "id": "florisboard", "name": "FlorisBoard" },
-                { "id": "apple_keyboard", "name": "Apple Keyboard" }
+                { "id": "apple_keyboard", "name": "Apple Keyboard" },
+                { "id": "typewise", "name": "Typewise" }
             ]
         }
     ]

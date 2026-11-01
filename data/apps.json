@@ -19,7 +19,8 @@
                 { "id": "startmail", "name": "StartMail" },
                 { "id": "runbox", "name": "Runbox" },
                 { "id": "disroot_webmail", "name": "Disroot webmail" },
-                { "id": "murena_workspace", "name": "Murena Email" }
+                { "id": "murena_workspace", "name": "Murena Email" },
+                { "id": "kypost", "name": "KyPost" }
             ]
         },
         {
@@ -147,7 +148,8 @@
                 { "id": "joplin", "name": "Joplin" },
                 { "id": "fossify_notes", "name": "Fossify Notes" },
                 { "id": "murena_workspace", "name": "Murena Notes" },
-                { "id": "futo_notes", "name": "FUTO Notes" }
+                { "id": "futo_notes", "name": "FUTO Notes" },
+                { "id": "kynotes", "name": "KyNotes" }
             ]
         },
         {
@@ -174,7 +176,8 @@
                 { "id": "ente_locker", "name": "Ente Locker" },
                 { "id": "pcloud", "name": "pCloud" },
                 { "id": "syncthing", "name": "Syncthing" },
-                { "id": "murena_workspace", "name": "Murena Workspace" }
+                { "id": "murena_workspace", "name": "Murena Workspace" },
+                { "id": "kydrive", "name": "KyDrive" }
             ]
         },
         {
@@ -224,7 +227,8 @@
                 { "id": "1password", "name": "1Password" },
                 { "id": "vaultwarden", "name": "Vaultwarden" },
                 { "id": "stratum", "name": "Stratum" },
-                { "id": "2fas_auth", "name": "2FAS Auth" }
+                { "id": "2fas_auth", "name": "2FAS Auth" },
+                { "id": "kyauth", "name": "KyAuth" }
             ]
         },
         {
@@ -243,7 +247,8 @@
                 { "id": "nextcloud_calendar", "name": "Nextcloud Calendar" },
                 { "id": "radicale", "name": "Radicale" },
                 { "id": "fossify_calendar", "name": "Fossify Calendar" },
-                { "id": "murena_workspace", "name": "Murena Calendar" }
+                { "id": "murena_workspace", "name": "Murena Calendar" },
+                { "id": "kycalendar", "name": "KyCalendar" }
             ]
         },
         {
@@ -397,7 +402,8 @@
                 { "id": "gamevox", "name": "GameVox" },
                 { "id": "stoat", "name": "Stoat" },
                 { "id": "fluxer", "name": "Fluxer" },
-                { "id": "mattermost", "name": "Mattermost" }
+                { "id": "mattermost", "name": "Mattermost" },
+                { "id": "kymessages", "name": "KyMessages" }
             ]
         },
         {
@@ -492,7 +498,8 @@
                 { "id": "adguard", "name": "AdGuard DNS" },
                 { "id": "quad9", "name": "Quad9 DNS" },
                 { "id": "mullvad_dns", "name": "Mullvad DNS" },
-                { "id": "opennic", "name": "OpenNIC" }
+                { "id": "opennic", "name": "OpenNIC" },
+                { "id": "kydns", "name": "KyDNS" }
             ]
         },
         {

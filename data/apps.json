@@ -121,7 +121,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "kymessages", "name": "KyMessages" }
             ]
         },
         {
@@ -261,7 +262,8 @@
             "private_alternatives": [
                 { "id": "fossify_contacts", "name": "Fossify Contacts" },
                 { "id": "proton_mail", "name": "Proton Contacts" },
-                { "id": "tuta_mail", "name": "Tuta Contacts" }
+                { "id": "tuta_mail", "name": "Tuta Contacts" },
+                { "id": "kypost", "name": "KyPost" }
             ]
         },
         {
@@ -444,7 +446,8 @@
                 { "id": "brave_talk", "name": "Brave Talk" },
                 { "id": "proton_meet", "name": "Proton Meet" },
                 { "id": "jitsi", "name": "Jitsi" },
-                { "id": "nextcloud_talk", "name": "Nextcloud Talk" }
+                { "id": "nextcloud_talk", "name": "Nextcloud Talk" },
+                { "id": "kymessages", "name": "KyMessages" }
             ]
         },
         {
@@ -582,7 +585,8 @@
                 { "id": "OpenOffice", "name": "OpenOffice" },
                 { "id": "CryptPad", "name": "CryptPad" },
                 { "id": "proton_docs", "name": "Proton Docs" },
-                { "id": "fileverse", "name": "Fileverse dDocs/dSheets" }
+                { "id": "fileverse", "name": "Fileverse dDocs/dSheets" },
+                { "id": "kydrive", "name": "KyDrive" }
             ]
         },
         {

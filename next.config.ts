@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     output: "export",
+    outputFileTracingRoot: process.cwd(),
     images: {
-        loader: "custom",
-        loaderFile: "./image-loader.ts",
-        qualities: [75, 100],
+        unoptimized: true,
+        localPatterns: [{ pathname: "/**" }],
     },
 };
 

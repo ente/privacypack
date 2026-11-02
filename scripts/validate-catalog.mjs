@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,55 +33,6 @@ function isNonEmptyString(value) {
     return typeof value === "string" && value.trim().length > 0;
 }
 
-function getJpegDimensions(filePath) {
-    const buffer = fs.readFileSync(filePath);
-
-    if (buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) {
-        return null;
-    }
-
-    let offset = 2;
-    const frameMarkers = new Set([
-        0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce,
-        0xcf,
-    ]);
-
-    while (offset < buffer.length) {
-        while (buffer[offset] === 0xff) {
-            offset += 1;
-        }
-
-        const marker = buffer[offset];
-        offset += 1;
-
-        if (marker === 0xd9 || marker === 0xda) {
-            break;
-        }
-
-        if (offset + 2 > buffer.length) {
-            break;
-        }
-
-        const segmentLength = buffer.readUInt16BE(offset);
-        offset += 2;
-
-        if (segmentLength < 2 || offset + segmentLength - 2 > buffer.length) {
-            break;
-        }
-
-        if (frameMarkers.has(marker)) {
-            return {
-                height: buffer.readUInt16BE(offset + 1),
-                width: buffer.readUInt16BE(offset + 3),
-            };
-        }
-
-        offset += segmentLength - 2;
-    }
-
-    return null;
-}
-
 function validateApp(app, context, usedLogoIds, seenIdsInBucket) {
     if (!app || typeof app !== "object" || Array.isArray(app)) {
         addError(`${context} must be an object.`);
@@ -110,51 +62,87 @@ function validateApp(app, context, usedLogoIds, seenIdsInBucket) {
     usedLogoIds.add(app.id);
 }
 
-function validateLogo(fileName) {
+async function validateLogo(fileName) {
     const filePath = path.join(logoDir, fileName);
     const relativePath = path.relative(repoRoot, filePath);
-    const stats = fs.statSync(filePath);
+    try {
+        const stats = fs.statSync(filePath);
 
-    if (stats.size > maxLogoBytes) {
+        if (stats.size > maxLogoBytes) {
+            addError(
+                `${relativePath} is ${stats.size} bytes; logos must be <= ${maxLogoBytes} bytes.`,
+            );
+            return;
+        }
+
+        const image = sharp(filePath, {
+            failOn: "warning",
+            limitInputPixels: expectedLogoSize * expectedLogoSize,
+        });
+        const metadata = await image.metadata();
+
+        if (metadata.format !== "jpeg") {
+            addError(
+                `${relativePath} must be a real JPEG file, not just a .jpg name.`,
+            );
+            return;
+        }
+
+        if (
+            metadata.width !== expectedLogoSize ||
+            metadata.height !== expectedLogoSize
+        ) {
+            addError(
+                `${relativePath} is ${metadata.width}x${metadata.height}; expected ${expectedLogoSize}x${expectedLogoSize}.`,
+            );
+            return;
+        }
+
+        // Reading metadata only checks headers. Decode every pixel to reject
+        // truncated or corrupt scan data even when its JPEG markers are intact.
+        await image.raw().toBuffer();
+    } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
         addError(
-            `${relativePath} is ${stats.size} bytes; logos must be <= ${maxLogoBytes} bytes.`,
-        );
-    }
-
-    const dimensions = getJpegDimensions(filePath);
-
-    if (!dimensions) {
-        addError(
-            `${relativePath} must be a real JPEG file, not just a .jpg name.`,
-        );
-        return;
-    }
-
-    if (
-        dimensions.width !== expectedLogoSize ||
-        dimensions.height !== expectedLogoSize
-    ) {
-        addError(
-            `${relativePath} is ${dimensions.width}x${dimensions.height}; expected ${expectedLogoSize}x${expectedLogoSize}.`,
+            `${relativePath} could not be fully decoded as a JPEG: ${detail}`,
         );
     }
 }
 
 const catalog = readJson(catalogPath);
 
-if (!catalog) {
-    process.exitCode = 1;
+if (!catalog || typeof catalog !== "object" || Array.isArray(catalog)) {
+    if (errors.length === 0) {
+        addError("data/apps.json must contain a catalog object.");
+    }
 } else {
     const categories = catalog.categories;
     const usedLogoIds = new Set();
     const categoryNames = new Set();
     const categoryOrders = new Set();
-    const logoFiles = fs.existsSync(logoDir)
-        ? fs.readdirSync(logoDir).filter((entry) => {
-              const fullPath = path.join(logoDir, entry);
-              return fs.statSync(fullPath).isFile();
-          })
-        : [];
+    const logoFiles = [];
+    if (fs.existsSync(logoDir)) {
+        try {
+            for (const entry of fs.readdirSync(logoDir)) {
+                const fullPath = path.join(logoDir, entry);
+                try {
+                    if (fs.statSync(fullPath).isFile()) {
+                        logoFiles.push(entry);
+                    }
+                } catch (error) {
+                    const detail =
+                        error instanceof Error ? error.message : String(error);
+                    addError(
+                        `Could not read public/app-logos/${entry}: ${detail}`,
+                    );
+                }
+            }
+        } catch (error) {
+            const detail =
+                error instanceof Error ? error.message : String(error);
+            addError(`Could not read public/app-logos: ${detail}`);
+        }
+    }
 
     if (!Array.isArray(categories) || categories.length === 0) {
         addError("data/apps.json must contain a non-empty categories array.");
@@ -260,22 +248,25 @@ if (!catalog) {
         for (const fileName of logoFiles.filter((entry) =>
             entry.endsWith(".jpg"),
         )) {
-            validateLogo(fileName);
+            await validateLogo(fileName);
         }
     }
 
-    const mainstreamCount = categories.reduce(
-        (total, category) => total + (category.mainstream_apps?.length ?? 0),
-        0,
-    );
-    const alternativeCount = categories.reduce(
-        (total, category) =>
-            total + (category.private_alternatives?.length ?? 0),
-        0,
-    );
+    const validCategories = Array.isArray(categories) ? categories : [];
+    const countApps = (bucketName) =>
+        validCategories.reduce(
+            (total, category) =>
+                total +
+                (Array.isArray(category?.[bucketName])
+                    ? category[bucketName].length
+                    : 0),
+            0,
+        );
+    const mainstreamCount = countApps("mainstream_apps");
+    const alternativeCount = countApps("private_alternatives");
 
     console.log(
-        `Catalog summary: ${categories.length} categories, ${mainstreamCount} mainstream apps, ${alternativeCount} private alternatives, ${usedLogoIds.size} logo assets in use.`,
+        `Catalog summary: ${validCategories.length} categories, ${mainstreamCount} mainstream apps, ${alternativeCount} private alternatives, ${usedLogoIds.size} logo assets in use.`,
     );
 }
 

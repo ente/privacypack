@@ -422,6 +422,7 @@
                 { "id": "nostr", "name": "Nostr" },
                 { "id": "lemmy", "name": "Lemmy" },
                 { "id": "peertube", "name": "PeerTube" },
+                { "id": "friendica", "name": "Friendica" }
                 { "id": "bluesky", "name": "Bluesky"}
             ]
         },

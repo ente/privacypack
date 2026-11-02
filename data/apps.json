@@ -608,6 +608,22 @@
                 { "id": "florisboard", "name": "FlorisBoard" },
                 { "id": "apple_keyboard", "name": "Apple Keyboard" }
             ]
+        },
+        {
+            "name": "Files Manager",
+            "order": 30,
+            "mainstream_apps": [
+                { "id": "google_files", "name": "Files by Google" },
+                { "id": "samsung_my_files", "name": "Samsung My Files" },
+                { "id": "xiaomi_file_manager", "name": "Xiaomi File Manager" },
+                { "id": "file_commander", "name": "File Commander" }
+            ],
+            "private_alternatives": [
+                { "id": "fossify_file_manager", "name": "Fossify File Manager" },
+                { "id": "clp_files", "name": "CLP Studio Files" },
+                { "id": "material_files", "name": "Material Files" },
+                { "id": "amaze_file_manager", "name": "Amaze File Manager" }
+            ]
         }
     ]
 }

@@ -224,6 +224,7 @@
                 { "id": "1password", "name": "1Password" },
                 { "id": "vaultwarden", "name": "Vaultwarden" },
                 { "id": "stratum", "name": "Stratum" },
+                { "id": "2fa", "name": "2fa" },
                 { "id": "2fas_auth", "name": "2FAS Auth" }
             ]
         },

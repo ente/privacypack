@@ -120,7 +120,8 @@
                 { "id": "imessage", "name": "iMessage" },
                 { "id": "molly", "name": "Molly" },
                 { "id": "fossify_messages", "name": "Fossify Messages" },
-                { "id": "rocket_chat", "name": "Rocket.Chat" }
+                { "id": "rocket_chat", "name": "Rocket.Chat" },
+                { "id": "white_noise", "name": "White Noise" }
             ]
         },
         {
@@ -274,6 +275,7 @@
                 { "id": "izzyondroid", "name": "IzzyOnDroid" },
                 { "id": "aurora_store", "name": "Aurora Store" },
                 { "id": "obtainium", "name": "Obtainium" }
+                { "id": "zapstore", "name": "Zapstore" }
             ]
         },
         {
@@ -327,6 +329,7 @@
                 { "id": "brave_leo", "name": "Brave Leo" },
                 { "id": "mistralai_lechat", "name": "LeChat" },
                 { "id": "ensu", "name": "Ensu" }
+                { "id": "nanogpt", "name": "NanoGPT" }
             ]
         },
         {

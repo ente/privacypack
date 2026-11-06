@@ -179,15 +179,25 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
                     left: "48px",
                     right: "55px",
                     height: "72px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                 }}
             >
                 <div
                     style={{
-                        position: "absolute",
-                        left: "0",
-                        top: "0",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "20px",
                     }}
                 >
+                    <Image
+                        src={getAssetUrl("/small-logo.png")}
+                        alt="Privacy Pack logo"
+                        width={98}
+                        height={72}
+                        className="h-auto"
+                    />
                     <Image
                         src={getAssetUrl("/url-logo.png")}
                         alt="PrivacyPack Logo"
@@ -198,19 +208,21 @@ const PrivacyPackResult: React.FC<PrivacyPackResultProps> = ({ pack }) => {
 
                 <div
                     style={{
-                        position: "absolute",
-                        right: "0",
-                        top: "-16px",
-                        width: "130px",
-                        height: "92px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        color: "#777777",
+                        fontSize: "28px",
+                        lineHeight: "1",
                     }}
                 >
+                    <span>by</span>
                     <Image
-                        src={getAssetUrl("/small-logo.png")}
-                        alt="Privacy Pack logo"
-                        width={140}
-                        height={103}
-                        className="h-auto w-full"
+                        src={getAssetUrl("/ente.svg")}
+                        alt="Ente logo"
+                        width={128}
+                        height={40}
+                        className="h-auto"
                     />
                 </div>
             </div>

@@ -832,6 +832,7 @@ test("html2canvas never fetches an image, so none can be missing from the PNG", 
         [
             "PrivacyPack Logo",
             "Privacy Pack logo",
+            "Ente logo",
             "Gmail",
             "Google Photos",
             "Proton Mail",

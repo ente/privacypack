@@ -283,7 +283,7 @@ export default function App() {
                 <div className="flex w-full flex-row items-center justify-between gap-y-2 max-sm:flex-wrap md:px-4 md:pt-4">
                     <Link
                         href="/"
-                        className="green-text pr-1 text-2xl font-bold sm:shrink-0"
+                        className="green-text pr-1 text-2xl font-bold tracking-[-0.08em] sm:shrink-0"
                     >
                         Privacy
                         <wbr />

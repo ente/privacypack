@@ -23,16 +23,18 @@
             ]
         },
         {
-            "name": "Photos",
-            "order": 2,
-            "mainstream_apps": [
-                { "id": "google_photos", "name": "Google Photos" },
-                { "id": "apple_photos", "name": "Apple Photos" },
-                { "id": "amazon_photos", "name": "Amazon Photos" },
-                { "id": "dropbox", "name": "Dropbox" },
-                { "id": "microsoft_photos", "name": "Microsoft Photos" },
-                { "id": "onedrive", "name": "OneDrive" }
-            ],
+               "name": "Photos",
+               "order": 2,
+        "mainstream_apps": [
+            { "id": "google_photos", "name": "Google Photos" },
+            { "id": "apple_photos", "name": "Apple Photos" },
+            { "id": "amazon_photos", "name": "Amazon Photos" },
+            { "id": "dropbox", "name": "Dropbox" },
+            { "id": "microsoft_photos", "name": "Microsoft Photos" },
+            { "id": "onedrive", "name": "OneDrive" },
+            { "id": "samsung_gallery", "name": "Samsung Gallery" }
+    ],
+
             "private_alternatives": [
                 { "id": "jottacloud", "name": "Jottacloud" },
                 { "id": "apple_photos", "name": "Apple Photos" },

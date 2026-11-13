@@ -19,7 +19,8 @@
                 { "id": "startmail", "name": "StartMail" },
                 { "id": "runbox", "name": "Runbox" },
                 { "id": "disroot_webmail", "name": "Disroot webmail" },
-                { "id": "murena_workspace", "name": "Murena Email" }
+                { "id": "murena_workspace", "name": "Murena Email" },
+                { "id": "fastmail", "name": "Fastmail" }
             ]
         },
         {
@@ -64,7 +65,8 @@
                 { "id": "searxng", "name": "SearXNG" },
                 { "id": "mojeek", "name": "Mojeek" },
                 { "id": "qwant", "name": "Qwant" },
-                { "id": "murena_find", "name": "Murena Find" }
+                { "id": "murena_find", "name": "Murena Find" },
+                { "id": "ecosia", "name": "Ecosia" }
             ]
         },
         {

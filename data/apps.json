@@ -64,7 +64,8 @@
                 { "id": "searxng", "name": "SearXNG" },
                 { "id": "mojeek", "name": "Mojeek" },
                 { "id": "qwant", "name": "Qwant" },
-                { "id": "murena_find", "name": "Murena Find" }
+                { "id": "murena_find", "name": "Murena Find" },
+                { "id": "fourget", "name": "4get"}
             ]
         },
         {

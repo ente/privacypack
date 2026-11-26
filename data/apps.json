@@ -35,7 +35,6 @@
             ],
             "private_alternatives": [
                 { "id": "jottacloud", "name": "Jottacloud" },
-                { "id": "apple_photos", "name": "Apple Photos" },
                 { "id": "ente_photos", "name": "Ente Photos" },
                 { "id": "proton_drive", "name": "Proton Drive" },
                 { "id": "immich", "name": "Immich" },
@@ -236,7 +235,6 @@
                 { "id": "apple_calendar", "name": "Apple Calendar" }
             ],
             "private_alternatives": [
-                { "id": "apple_calendar", "name": "Apple Calendar" },
                 { "id": "proton_calendar", "name": "Proton Calendar" },
                 { "id": "mailbox", "name": "mailbox.org" },
                 { "id": "tuta_calendar", "name": "Tuta Calendar" },
@@ -341,7 +339,6 @@
             ],
             "private_alternatives": [
                 { "id": "home_assistant", "name": "Home Assistant" },
-                { "id": "apple_homekit", "name": "Apple HomeKit" },
                 { "id": "openhab", "name": "OpenHAB" },
                 { "id": "domoticz", "name": "Domoticz" },
                 { "id": "iobroker", "name": "ioBroker" }
@@ -357,7 +354,6 @@
             ],
             "private_alternatives": [
                 { "id": "comaps", "name": "CoMaps" },
-                { "id": "apple_maps", "name": "Apple Maps" },
                 { "id": "organic_maps", "name": "Organic Maps" },
                 { "id": "kagi", "name": "Kagi Maps" },
                 { "id": "magic_earth", "name": "Magic Earth" },
@@ -456,7 +452,6 @@
             ],
             "private_alternatives": [
                 { "id": "cash", "name": "Cash" },
-                { "id": "apple_pay", "name": "Apple Pay" },
                 { "id": "monero", "name": "Monero" },
                 { "id": "zcash", "name": "Zcash" }
             ]
